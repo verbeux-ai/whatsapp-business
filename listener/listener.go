@@ -1,5 +1,9 @@
 package listener
 
+import (
+	"io"
+)
+
 type listener struct {
 	chError chan error
 
@@ -34,6 +38,7 @@ func (s *listener) HandleErrors(f func(error)) (closer func()) {
 type MessageListener interface {
 	HandleErrors(f func(error)) (closer func())
 	OnTextMessage(TextMessageListener)
+	ReadBodyAsync(rawBody io.ReadCloser) error
 }
 
 func (s *listener) OnTextMessage(message TextMessageListener) {
