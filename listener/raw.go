@@ -16,11 +16,11 @@ type rawChange struct {
 }
 
 type rawValue struct {
-	MessagingProduct string       `json:"messaging_product"`
-	Metadata         rawMetadata  `json:"metadata"`
-	Contacts         []rawContact `json:"contacts"`
-	Messages         []rawMessage `json:"messages"`
-	Statuses         []rawStatus  `json:"statuses,omitempty"`
+	MessagingProduct string              `json:"messaging_product"`
+	Metadata         rawMetadata         `json:"metadata"`
+	Contacts         []rawContact        `json:"contacts"`
+	Messages         []rawMessageContent `json:"messages"`
+	Statuses         []rawStatus         `json:"statuses,omitempty"`
 }
 
 type rawMetadata struct {
@@ -37,7 +37,7 @@ type rawProfile struct {
 	Name string `json:"name"`
 }
 
-type rawMessage struct {
+type rawMessageContent struct {
 	From        string               `json:"from"`
 	ID          string               `json:"id"`
 	Timestamp   string               `json:"timestamp"`

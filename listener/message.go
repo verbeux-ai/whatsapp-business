@@ -11,8 +11,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *listener) treatMessage(text rawMessage) (*TextMessage, error) {
-	content := ""
+func (s *listener) treatTextMessage(text rawMessageContent) (*TextMessage, error) {
+	var content string
 	if text.Text != nil {
 		return nil, ErrEmptyMessage
 	}
@@ -45,7 +45,7 @@ func (s *listener) ReadBodyAsync(rawBody io.ReadCloser) error {
 						wg.Add(1)
 						go func() {
 							defer wg.Done()
-							msg, err := s.treatMessage(message)
+							msg, err := s.treatTextMessage(message)
 							if err != nil {
 								zap.L().Error("failed to treat message", zap.Error(err))
 								return
