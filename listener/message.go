@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"sync"
 	"time"
-
-	"go.uber.org/zap"
 )
 
 func (s *listener) treatTextMessage(text rawMessageContent) (*TextMessage, error) {
@@ -47,11 +45,11 @@ func (s *listener) ReadBodyAsync(rawBody io.ReadCloser) error {
 							defer wg.Done()
 							msg, err := s.treatTextMessage(message)
 							if err != nil {
-								zap.L().Error("failed to treat message", zap.Error(err))
+								s.chError <- err
 								return
 							}
 							if err := (*s.textMessageListener)(msg); err != nil {
-								zap.L().Error("failed to run listener", zap.Error(err))
+								s.chError <- err
 							}
 						}()
 					}
