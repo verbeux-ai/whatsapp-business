@@ -47,8 +47,8 @@ func (s *Client) GetPhoneNumber(phoneID string) (*PhoneNumberResponse, error) {
 }
 
 type RegisterPhoneNumberRequest struct {
-	MessagingProduct string `json:"messaging_product"`
-	Pin              string `json:"pin"`
+	MessagingProduct messagingProductType `json:"messaging_product"`
+	Pin              string               `json:"pin"`
 }
 
 type RegisterPhoneNumberResponse struct {
@@ -56,8 +56,11 @@ type RegisterPhoneNumberResponse struct {
 	*ErrorResponse
 }
 
-func (s *Client) RegisterPhoneNumber(phoneID string, request *RegisterPhoneNumberRequest) (*RegisterPhoneNumberResponse, error) {
-	res, err := s.metaRequest(request, http.MethodPost, fmt.Sprintf(phoneNumberRegister, phoneID))
+func (s *Client) RegisterPhoneNumber(phoneID string, pin string) (*RegisterPhoneNumberResponse, error) {
+	res, err := s.metaRequest(RegisterPhoneNumberRequest{
+		MessagingProduct: whatsappMessagingProduct,
+		Pin:              pin,
+	}, http.MethodPost, fmt.Sprintf(phoneNumberRegister, phoneID))
 	if err != nil {
 		return nil, err
 	}
