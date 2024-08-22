@@ -15,7 +15,7 @@ type BusinessResponse struct {
 }
 
 func (s *Client) GetBusiness(businessAccountId string) (*BusinessResponse, error) {
-	res, err := s.metaRequest(nil, http.MethodGet, fmt.Sprintf("%s", businessAccountId))
+	res, err := s.metaRequestWithToken(nil, http.MethodGet, fmt.Sprintf("%s", businessAccountId))
 	if err != nil {
 		return nil, err
 	}

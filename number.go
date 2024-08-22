@@ -29,7 +29,7 @@ type PhoneNumberResponseWhatsappConfiguration struct {
 }
 
 func (s *Client) GetPhoneNumber(phoneID string) (*PhoneNumberResponse, error) {
-	res, err := s.metaRequest(nil, http.MethodGet, fmt.Sprintf("%s", phoneID))
+	res, err := s.metaRequestWithToken(nil, http.MethodGet, fmt.Sprintf("%s", phoneID))
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ type RegisterPhoneNumberResponse struct {
 }
 
 func (s *Client) RegisterPhoneNumber(phoneID string, pin string) (*RegisterPhoneNumberResponse, error) {
-	res, err := s.metaRequest(RegisterPhoneNumberRequest{
+	res, err := s.metaRequestWithToken(RegisterPhoneNumberRequest{
 		MessagingProduct: whatsappMessagingProduct,
 		Pin:              pin,
 	}, http.MethodPost, fmt.Sprintf(phoneNumberRegister, phoneID))
@@ -92,7 +92,7 @@ type SetPhoneNumberWebhookResponse struct {
 }
 
 func (s *Client) SetPhoneNumberWebhook(phoneID string, request *SetPhoneNumberWebhookConfig) (*SetPhoneNumberWebhookResponse, error) {
-	res, err := s.metaRequest(SetPhoneNumberWebhookRequest{
+	res, err := s.metaRequestWithToken(SetPhoneNumberWebhookRequest{
 		WebhookConfiguration: *request,
 	}, http.MethodPost, phoneID)
 	if err != nil {
