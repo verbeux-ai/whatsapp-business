@@ -91,8 +91,10 @@ type SetPhoneNumberWebhookResponse struct {
 	*ErrorResponse
 }
 
-func (s *Client) SetPhoneNumberWebhook(phoneID string, request *SetPhoneNumberWebhookRequest) (*SetPhoneNumberWebhookResponse, error) {
-	res, err := s.metaRequest(request, http.MethodPost, fmt.Sprintf(phoneNumberRegister, phoneID))
+func (s *Client) SetPhoneNumberWebhook(phoneID string, request *SetPhoneNumberWebhookConfig) (*SetPhoneNumberWebhookResponse, error) {
+	res, err := s.metaRequest(SetPhoneNumberWebhookRequest{
+		WebhookConfiguration: *request,
+	}, http.MethodPost, phoneID)
 	if err != nil {
 		return nil, err
 	}
