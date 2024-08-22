@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (s *listener) treatTextMessage(text rawMessageContent) (*TextMessage, error) {
+func (s *listener) treatTextMessage(text rawMessageContent, metaData rawMetadata) (*TextMessage, error) {
 	var content string
 	if text.Text == nil {
 		return nil, ErrEmptyMessage
@@ -24,10 +24,11 @@ func (s *listener) treatTextMessage(text rawMessageContent) (*TextMessage, error
 
 	messageTime := time.Unix(messageTimeInt, 0)
 	return &TextMessage{
-		From:    text.From,
-		ID:      text.ID,
-		Message: content,
-		Time:    messageTime,
+		From:            text.From,
+		ID:              text.ID,
+		Message:         content,
+		Time:            messageTime,
+		ToPhoneNumberId: metaData.PhoneNumberID,
 	}, nil
 }
 
@@ -45,7 +46,7 @@ func (s *listener) ReadBodyAsync(rawBody io.ReadCloser) error {
 						wg.Add(1)
 						go func() {
 							defer wg.Done()
-							msg, err := s.treatTextMessage(message)
+							msg, err := s.treatTextMessage(message, change.Value.Metadata)
 							if err != nil {
 								s.chError <- err
 								return
