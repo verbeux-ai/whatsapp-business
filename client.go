@@ -20,7 +20,7 @@ type Option func(*Client)
 // NewClient creates a new client with the provided options
 func NewClient(opts ...Option) *Client {
 	c := &Client{
-		baseUrl:    "https://graph.facebook.com/v20.0/",
+		baseUrl:    "https://graph.facebook.com/v20.0",
 		httpClient: http.DefaultClient,
 	}
 
@@ -42,6 +42,13 @@ func WithToken(token string) Option {
 func WithBaseUrl(baseUrl string) Option {
 	return func(c *Client) {
 		c.baseUrl = baseUrl
+	}
+}
+
+// WithPhoneNumberId sets the phone number id of the client
+func WithPhoneNumberId(phoneNumberId string) Option {
+	return func(c *Client) {
+		c.phoneNumberID = phoneNumberId
 	}
 }
 

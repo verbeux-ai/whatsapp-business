@@ -1,7 +1,6 @@
 package whatsapp_business
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -80,7 +79,7 @@ func (s *Client) SendTextMessage(to string, d TextMessage) (*MessageResponse, er
 }
 
 func (s *Client) messageRequest(body any) (*MessageResponse, error) {
-	resp, err := s.metaRequest(body, http.MethodPost, fmt.Sprintf("%s/%s", s.phoneNumberID, "messages"))
+	resp, err := s.metaRequestWithToken(body, http.MethodPost, fmt.Sprintf("%s/%s", s.phoneNumberID, messageEndpoint))
 	if err != nil {
 		return nil, err
 	}
@@ -91,23 +90,4 @@ func (s *Client) messageRequest(body any) (*MessageResponse, error) {
 		return nil, err
 	}
 	return &toReturn, nil
-}
-
-func (s *Client) metaRequest(reqBody any, method, endpoint string) (*http.Response, error) {
-	marshalledBody, err := json.Marshal(reqBody)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader := bytes.NewReader(marshalledBody)
-
-	url := fmt.Sprintf("%s/%s", s.baseUrl, endpoint)
-
-	req, err := http.NewRequest(method, url, bodyReader)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", "Bearer "+s.token)
-
-	return s.httpClient.Do(req)
 }

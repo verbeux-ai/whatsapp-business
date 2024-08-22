@@ -11,8 +11,10 @@ import (
 
 func (s *listener) treatTextMessage(text rawMessageContent) (*TextMessage, error) {
 	var content string
-	if text.Text != nil {
+	if text.Text == nil {
 		return nil, ErrEmptyMessage
+	} else {
+		content = text.Text.Body
 	}
 
 	messageTimeInt, err := strconv.ParseInt(text.Timestamp, 10, 64)
