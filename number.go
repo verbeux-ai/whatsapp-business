@@ -78,10 +78,14 @@ func (s *Client) RegisterPhoneNumber(phoneID string, pin string) (*RegisterPhone
 }
 
 type SetPhoneNumberWebhookRequest struct {
-	WebhookConfiguration SetPhoneNumberWebhookConfig `json:"webhook_configuration"`
+	WebhookConfiguration SetWebhookConfig `json:"webhook_configuration"`
 }
 
-type SetPhoneNumberWebhookConfig struct {
+type SetBusinessWebhookRequest struct {
+	WebhookConfiguration SetWebhookConfig `json:"webhook_configuration"`
+}
+
+type SetWebhookConfig struct {
 	OverrideCallbackUri string `json:"override_callback_uri"`
 	VerifyToken         string `json:"verify_token"`
 }
@@ -91,7 +95,12 @@ type SetPhoneNumberWebhookResponse struct {
 	*ErrorResponse
 }
 
-func (s *Client) SetPhoneNumberWebhook(phoneID string, request *SetPhoneNumberWebhookConfig) (*SetPhoneNumberWebhookResponse, error) {
+type SetBusinessWebhookResponse struct {
+	Success bool `json:"success"`
+	*ErrorResponse
+}
+
+func (s *Client) SetPhoneNumberWebhook(phoneID string, request *SetWebhookConfig) (*SetPhoneNumberWebhookResponse, error) {
 	res, err := s.metaRequestWithToken(SetPhoneNumberWebhookRequest{
 		WebhookConfiguration: *request,
 	}, http.MethodPost, phoneID)

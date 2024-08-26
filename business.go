@@ -31,3 +31,23 @@ func (s *Client) GetBusiness(businessAccountId string) (*BusinessResponse, error
 
 	return &toReturn, nil
 }
+
+func (s *Client) SetBusinessWebhook(businessAccountId string, request *SetWebhookConfig) (*SetBusinessWebhookResponse, error) {
+	res, err := s.metaRequestWithToken(SetBusinessWebhookRequest{
+		WebhookConfiguration: *request,
+	}, http.MethodPost, businessAccountId)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	var toReturn SetBusinessWebhookResponse
+	if err = json.NewDecoder(res.Body).Decode(&toReturn); err != nil {
+		return nil, err
+	}
+	if toReturn.ErrorResponse != nil {
+		return nil, fmt.Errorf("%s: %v", toReturn.ErrorResponse.Error.Message, toReturn)
+	}
+
+	return &toReturn, nil
+}
