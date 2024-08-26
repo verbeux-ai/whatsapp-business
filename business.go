@@ -35,7 +35,7 @@ func (s *Client) GetBusiness(businessAccountId string) (*BusinessResponse, error
 func (s *Client) SetBusinessWebhook(businessAccountId string, request *SetWebhookConfig) (*SetBusinessWebhookResponse, error) {
 	res, err := s.metaRequestWithToken(SetBusinessWebhookRequest{
 		WebhookConfiguration: *request,
-	}, http.MethodPost, businessAccountId)
+	}, http.MethodPost, fmt.Sprintf(businessSubscribedApps, businessAccountId))
 	if err != nil {
 		return nil, err
 	}
