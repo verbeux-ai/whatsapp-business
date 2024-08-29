@@ -2,6 +2,7 @@ package whatsapp_business
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -63,6 +64,7 @@ type MessageResponse struct {
 	MessagingProduct string                   `json:"messaging_product"`
 	Contacts         []contactMessageResponse `json:"contacts"`
 	Messages         []contentMessageResponse `json:"messages"`
+	*ErrorResponse
 }
 
 func (s *Client) SendMessage(to string, txt string) error {
@@ -79,7 +81,7 @@ func (s *Client) SendTextMessage(to string, d TextMessage) (*MessageResponse, er
 }
 
 func (s *Client) messageRequest(body any) (*MessageResponse, error) {
-	resp, err := s.metaRequestWithToken(body, http.MethodPost, fmt.Sprintf("%s/%s", s.phoneNumberID, messageEndpoint))
+	resp, err := s.metaRequestWithToken(body, http.MethodPost, fmt.Sprintf("%s/%s", s.phoneNumberID, messagesEndpoint))
 	if err != nil {
 		return nil, err
 	}
@@ -89,5 +91,10 @@ func (s *Client) messageRequest(body any) (*MessageResponse, error) {
 	if err = json.NewDecoder(resp.Body).Decode(&toReturn); err != nil {
 		return nil, err
 	}
+
+	if toReturn.ErrorResponse != nil {
+		return nil, errors.New(toReturn.ErrorResponse.Error.Message)
+	}
+
 	return &toReturn, nil
 }
