@@ -127,9 +127,11 @@ func (s *listener) ReadBodySync(RawBody io.ReadCloser) error {
 				}
 			}
 
-			for _, status := range change.Value.Statuses {
-				if err := s.treatStatus(status); err != nil {
-					return err
+			if s.statusMessageListener != nil {
+				for _, status := range change.Value.Statuses {
+					if err := s.treatStatus(status); err != nil {
+						return err
+					}
 				}
 			}
 		}
