@@ -53,6 +53,40 @@ func (s *Client) SetBusinessWebhook(ctx context.Context, businessAccountId strin
 	return &toReturn, nil
 }
 
-func (s *Client) GetBusinessProfile(ctx context.Context, number string) {
+type BusinessProfileResponse struct {
+	Data []BusinessProfile `json:"data"`
+	*ErrorResponse
+}
 
+type BusinessProfile struct {
+	About             string   `json:"about"`
+	Address           string   `json:"address"`
+	Description       string   `json:"description"`
+	Email             string   `json:"email"`
+	MessagingProduct  string   `json:"messaging_product"`
+	ProfilePictureUrl string   `json:"profile_picture_url"`
+	Websites          []string `json:"websites"`
+	Vertical          string   `json:"vertical"`
+}
+
+func (s *Client) GetBusinessProfile(ctx context.Context, phoneID string) (*BusinessProfile, error) {
+	res, err := s.metaRequestWithToken(ctx, nil, http.MethodGet, fmt.Sprintf(whatsappBusinessProfile, phoneID)+"?fields=about,address,description,email,profile_picture_url,websites,vertical")
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	var toReturn BusinessProfileResponse
+	if err = json.NewDecoder(res.Body).Decode(&toReturn); err != nil {
+		return nil, err
+	}
+	if toReturn.ErrorResponse != nil {
+		return nil, fmt.Errorf("%s: %v", toReturn.ErrorResponse.Error.Message, toReturn)
+	}
+
+	if len(toReturn.Data) > 0 {
+		return &toReturn.Data[0], nil
+	}
+
+	return nil, nil
 }

@@ -19,11 +19,14 @@ type ErrorResponse struct {
 }
 
 func (s *Client) metaRequestWithToken(ctx context.Context, reqBody any, method, endpoint string) (*http.Response, error) {
-	marshalledBody, err := json.Marshal(reqBody)
-	if err != nil {
-		return nil, err
+	var bodyReader io.Reader
+	if reqBody != nil {
+		marshalledBody, err := json.Marshal(reqBody)
+		if err != nil {
+			return nil, err
+		}
+		bodyReader = bytes.NewReader(marshalledBody)
 	}
-	bodyReader := bytes.NewReader(marshalledBody)
 
 	url := fmt.Sprintf("%s/%s", s.baseUrl, endpoint)
 
