@@ -2,6 +2,7 @@ package listener
 
 import (
 	"io"
+	"sync"
 )
 
 type listener struct {
@@ -11,6 +12,7 @@ type listener struct {
 	audioMessageListener    *AudioMessageListener
 	imageMessageListener    *ImageMessageListener
 	documentMessageListener *DocumentMessageListener
+	statusMessageListener   *StatusMessageListener
 }
 
 func NewMessageListener() MessageListener {
@@ -44,7 +46,8 @@ type MessageListener interface {
 	OnAudioMessage(AudioMessageListener)
 	OnImageMessage(ImageMessageListener)
 	OnDocumentMessage(DocumentMessageListener)
-	ReadBodyAsync(rawBody io.ReadCloser) error
+	OnStatusMessage(StatusMessageListener)
+	ReadBodyAsync(rawBody io.ReadCloser) *sync.WaitGroup
 	ReadBodySync(rawBody io.ReadCloser) error
 }
 
@@ -62,4 +65,8 @@ func (s *listener) OnImageMessage(listener ImageMessageListener) {
 
 func (s *listener) OnDocumentMessage(listener DocumentMessageListener) {
 	s.documentMessageListener = &listener
+}
+
+func (s *listener) OnStatusMessage(listener StatusMessageListener) {
+	s.statusMessageListener = &listener
 }

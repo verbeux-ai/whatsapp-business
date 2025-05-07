@@ -9,67 +9,81 @@ import (
 	"time"
 )
 
-func (s *listener) ReadBodyAsync(RawBody io.ReadCloser) error {
-	var data RawMessage
-	if err := json.NewDecoder(RawBody).Decode(&data); err != nil {
-		return err
-	}
-
+func (s *listener) ReadBodyAsync(RawBody io.ReadCloser) *sync.WaitGroup {
 	wg := sync.WaitGroup{}
-	for _, entry := range data.Entry {
-		for _, change := range entry.Changes {
-			var contacts []Contact
-			for _, contact := range change.Value.Contacts {
-				contacts = append(contacts, Contact{
-					Name: contact.Profile.Name,
-					WaID: contact.WaID,
-				})
-			}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 
-			for _, message := range change.Value.Messages {
-				if message.Text != nil && s.textMessageListener != nil {
-					wg.Add(1)
-					go func(message RawMessageContent, change RawChange, contacts []Contact) {
-						defer wg.Done()
-						if err := s.treatText(message, change, contacts); err != nil {
-							s.chError <- err
-						}
-					}(message, change, contacts)
+		var data RawMessage
+		if err := json.NewDecoder(RawBody).Decode(&data); err != nil {
+			s.chError <- err
+			return
+		}
+
+		for _, entry := range data.Entry {
+			for _, change := range entry.Changes {
+				var contacts []Contact
+				for _, contact := range change.Value.Contacts {
+					contacts = append(contacts, Contact{
+						Name: contact.Profile.Name,
+						WaID: contact.WaID,
+					})
 				}
-				if message.Audio != nil && s.audioMessageListener != nil {
-					wg.Add(1)
-					go func(message RawMessageContent, change RawChange, contacts []Contact) {
-						defer wg.Done()
-						if err := s.treatAudio(message, change, contacts); err != nil {
-							s.chError <- err
-						}
-					}(message, change, contacts)
+
+				for _, message := range change.Value.Messages {
+					if message.Text != nil && s.textMessageListener != nil {
+						wg.Add(1)
+						go func(message RawMessageContent, change RawChange, contacts []Contact) {
+							defer wg.Done()
+							if err := s.treatText(message, change, contacts); err != nil {
+								s.chError <- err
+							}
+						}(message, change, contacts)
+					}
+					if message.Audio != nil && s.audioMessageListener != nil {
+						wg.Add(1)
+						go func(message RawMessageContent, change RawChange, contacts []Contact) {
+							defer wg.Done()
+							if err := s.treatAudio(message, change, contacts); err != nil {
+								s.chError <- err
+							}
+						}(message, change, contacts)
+					}
+					if message.Image != nil && s.imageMessageListener != nil {
+						wg.Add(1)
+						go func(message RawMessageContent, change RawChange, contacts []Contact) {
+							defer wg.Done()
+							if err := s.treatImage(message, change, contacts); err != nil {
+								s.chError <- err
+							}
+						}(message, change, contacts)
+					}
+					if message.Document != nil && s.documentMessageListener != nil {
+						wg.Add(1)
+						go func(message RawMessageContent, change RawChange, contacts []Contact) {
+							defer wg.Done()
+							if err := s.treatDocument(message, change, contacts); err != nil {
+								s.chError <- err
+							}
+						}(message, change, contacts)
+					}
 				}
-				if message.Image != nil && s.imageMessageListener != nil {
+
+				for _, status := range change.Value.Statuses {
 					wg.Add(1)
-					go func(message RawMessageContent, change RawChange, contacts []Contact) {
+					go func(status RawStatus) {
 						defer wg.Done()
-						if err := s.treatImage(message, change, contacts); err != nil {
+						if err := s.treatStatus(status); err != nil {
 							s.chError <- err
 						}
-					}(message, change, contacts)
-				}
-				if message.Document != nil && s.documentMessageListener != nil {
-					wg.Add(1)
-					go func(message RawMessageContent, change RawChange, contacts []Contact) {
-						defer wg.Done()
-						if err := s.treatDocument(message, change, contacts); err != nil {
-							s.chError <- err
-						}
-					}(message, change, contacts)
+					}(status)
 				}
 			}
 		}
-	}
+	}()
 
-	wg.Wait()
-
-	return nil
+	return &wg
 }
 
 func (s *listener) ReadBodySync(RawBody io.ReadCloser) error {
@@ -108,6 +122,12 @@ func (s *listener) ReadBodySync(RawBody io.ReadCloser) error {
 					if err := s.treatDocument(message, change, contacts); err != nil {
 						return err
 					}
+				}
+			}
+
+			for _, status := range change.Value.Statuses {
+				if err := s.treatStatus(status); err != nil {
+					return err
 				}
 			}
 		}
@@ -224,6 +244,36 @@ func (s *listener) treatImageMessage(rawMessage RawMessageContent, metaData RawM
 		Time:            messageTime,
 		ToPhoneNumberId: metaData.PhoneNumberID,
 		Caption:         rawMessage.Image.Caption,
+	}, nil
+}
+
+func (s *listener) treatStatus(rawStatus RawStatus) error {
+	msg, err := s.treatStatusMessage(rawStatus)
+	if err != nil {
+		return err
+	}
+	if err := (*s.statusMessageListener)(msg); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *listener) treatStatusMessage(rawStatus RawStatus) (*StatusMessage, error) {
+	messageTimeInt, err := strconv.ParseInt(rawStatus.Timestamp, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrTimestampInvalid, err)
+	}
+
+	messageTime := time.Unix(messageTimeInt, 0)
+	return &StatusMessage{
+		ID:             rawStatus.ID,
+		Status:         StatusType(rawStatus.Status),
+		Time:           messageTime,
+		WaID:           rawStatus.RecipientID,
+		ConversationID: rawStatus.Conversation.ID,
+		Origin: Origin{
+			Type: rawStatus.Conversation.Origin.Type,
+		},
 	}, nil
 }
 

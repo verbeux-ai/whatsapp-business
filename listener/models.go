@@ -51,3 +51,25 @@ type DocumentMessage struct {
 	ToPhoneNumberId string
 }
 type DocumentMessageListener func(message *DocumentMessage) error
+
+type Origin struct {
+	Type string
+}
+
+type StatusType string
+
+const (
+	StatusTypeRead      StatusType = "read"
+	StatusTypeDelivered StatusType = "delivered"
+	StatusTypeSent      StatusType = "sent"
+)
+
+type StatusMessage struct {
+	ID             string
+	Status         StatusType
+	Time           time.Time
+	WaID           string
+	ConversationID string
+	Origin         Origin
+}
+type StatusMessageListener func(message *StatusMessage) error

@@ -169,3 +169,43 @@ const documentMessage = `{
     ],
     "object": "whatsapp_business_account"
   }`
+
+const statusesMessage = `{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "190897907451133",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "15550077211",
+              "phone_number_id": "245796831949065"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgMNTU4NTk4NDM3NDQwFQIAERgSMUU4NzE3QkFGMjkyQjk5RTJGAA==",
+                "status": "delivered",
+                "timestamp": "1746590336",
+                "recipient_id": "558598437440",
+                "conversation": {
+                  "id": "6852cd1442983d45cbdc8958f5f3f066",
+                  "origin": {
+                    "type": "utility"
+                  }
+                },
+                "pricing": {
+                  "billable": true,
+                  "pricing_model": "CBP",
+                  "category": "utility"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}`

@@ -220,13 +220,13 @@ type RawReferredProduct struct {
 }
 
 type RawStatus struct {
-	ID           string           `json:"id"`
-	Status       string           `json:"status"`
-	Timestamp    string           `json:"timestamp"`
-	RecipientID  string           `json:"recipient_id"`
-	Conversation *RawConversation `json:"conversation,omitempty"`
-	Pricing      *RawPricing      `json:"pricing,omitempty"`
-	Errors       *[]RawError      `json:"errors,omitempty"`
+	ID           string          `json:"id"`
+	Status       string          `json:"status"`
+	Timestamp    string          `json:"timestamp"`
+	RecipientID  string          `json:"recipient_id"`
+	Conversation RawConversation `json:"conversation,omitempty"`
+	Pricing      RawPricing      `json:"pricing,omitempty"`
+	Errors       []RawError      `json:"errors,omitempty"`
 }
 
 type RawConversation struct {

@@ -24,7 +24,7 @@ func TestListener_OnTextMessage(t *testing.T) {
 		return nil
 	})
 
-	err := client.ReadBodyAsync(io.NopCloser(bytes.NewReader([]byte(textMessage))))
+	err := client.ReadBodySync(io.NopCloser(bytes.NewReader([]byte(textMessage))))
 	require.NoError(t, err)
 }
 
@@ -44,7 +44,7 @@ func TestListener_OnAudioMessage(t *testing.T) {
 		return nil
 	})
 
-	err := client.ReadBodyAsync(io.NopCloser(bytes.NewReader([]byte(audioMessage))))
+	err := client.ReadBodySync(io.NopCloser(bytes.NewReader([]byte(audioMessage))))
 	require.NoError(t, err)
 }
 
@@ -64,7 +64,7 @@ func TestListener_OnImageMessage(t *testing.T) {
 		return nil
 	})
 
-	err := client.ReadBodyAsync(io.NopCloser(bytes.NewReader([]byte(imageMessage))))
+	err := client.ReadBodySync(io.NopCloser(bytes.NewReader([]byte(imageMessage))))
 	require.NoError(t, err)
 }
 
@@ -85,6 +85,25 @@ func TestListener_OnDocumentMessage(t *testing.T) {
 		return nil
 	})
 
-	err := client.ReadBodyAsync(io.NopCloser(bytes.NewReader([]byte(documentMessage))))
+	err := client.ReadBodySync(io.NopCloser(bytes.NewReader([]byte(documentMessage))))
+	require.NoError(t, err)
+}
+
+func TestListener_OnStatusMessage(t *testing.T) {
+	client := listener.NewMessageListener()
+
+	client.OnStatusMessage(func(message *listener.StatusMessage) error {
+		require.NotEmpty(t, message)
+		require.NotEmpty(t, message.ID)
+		require.NotEmpty(t, message.Time)
+		require.NotEmpty(t, message.Status)
+		require.NotEmpty(t, message.Origin)
+		require.NotEmpty(t, message.Origin.Type)
+		require.NotEmpty(t, message.WaID)
+		require.NotEmpty(t, message.ConversationID)
+		return nil
+	})
+
+	err := client.ReadBodySync(io.NopCloser(bytes.NewReader([]byte(statusesMessage))))
 	require.NoError(t, err)
 }
