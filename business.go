@@ -52,3 +52,7 @@ func (s *Client) SetBusinessWebhook(ctx context.Context, businessAccountId strin
 
 	return &toReturn, nil
 }
+
+func (s *Client) GetBusinessProfile(ctx context.Context, number string) {
+
+}

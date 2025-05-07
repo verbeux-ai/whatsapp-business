@@ -62,6 +62,7 @@ const (
 	StatusTypeRead      StatusType = "read"
 	StatusTypeDelivered StatusType = "delivered"
 	StatusTypeSent      StatusType = "sent"
+	StatusTypeError     StatusType = "error"
 )
 
 type StatusMessage struct {

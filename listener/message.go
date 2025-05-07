@@ -70,14 +70,16 @@ func (s *listener) ReadBodyAsync(RawBody io.ReadCloser) *sync.WaitGroup {
 					}
 				}
 
-				for _, status := range change.Value.Statuses {
-					wg.Add(1)
-					go func(status RawStatus) {
-						defer wg.Done()
-						if err := s.treatStatus(status); err != nil {
-							s.chError <- err
-						}
-					}(status)
+				if s.statusMessageListener != nil {
+					for _, status := range change.Value.Statuses {
+						wg.Add(1)
+						go func(status RawStatus) {
+							defer wg.Done()
+							if err := s.treatStatus(status); err != nil {
+								s.chError <- err
+							}
+						}(status)
+					}
 				}
 			}
 		}
