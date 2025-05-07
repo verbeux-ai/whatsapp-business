@@ -7,7 +7,10 @@ import (
 type listener struct {
 	chError chan error
 
-	textMessageListener *TextMessageListener
+	textMessageListener     *TextMessageListener
+	audioMessageListener    *AudioMessageListener
+	imageMessageListener    *ImageMessageListener
+	documentMessageListener *DocumentMessageListener
 }
 
 func NewMessageListener() MessageListener {
@@ -38,9 +41,25 @@ func (s *listener) HandleErrors(f func(error)) (closer func()) {
 type MessageListener interface {
 	HandleErrors(f func(error)) (closer func())
 	OnTextMessage(TextMessageListener)
+	OnAudioMessage(AudioMessageListener)
+	OnImageMessage(ImageMessageListener)
+	OnDocumentMessage(DocumentMessageListener)
 	ReadBodyAsync(rawBody io.ReadCloser) error
+	ReadBodySync(rawBody io.ReadCloser) error
 }
 
-func (s *listener) OnTextMessage(message TextMessageListener) {
-	s.textMessageListener = &message
+func (s *listener) OnTextMessage(listener TextMessageListener) {
+	s.textMessageListener = &listener
+}
+
+func (s *listener) OnAudioMessage(listener AudioMessageListener) {
+	s.audioMessageListener = &listener
+}
+
+func (s *listener) OnImageMessage(listener ImageMessageListener) {
+	s.imageMessageListener = &listener
+}
+
+func (s *listener) OnDocumentMessage(listener DocumentMessageListener) {
+	s.documentMessageListener = &listener
 }

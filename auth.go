@@ -1,6 +1,7 @@
 package whatsapp_business
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,8 +13,8 @@ type AuthResponse struct {
 	*ErrorResponse
 }
 
-func (s *Client) GenerateAccessToken(code, clientID, clientSecret string) (*AuthResponse, error) {
-	res, err := s.metaRequest(nil, http.MethodGet, fmt.Sprintf("%s?code=%s&client_id=%s&client_secret=%s", oAuthAccessTokenEndpoint, code, clientID, clientSecret))
+func (s *Client) GenerateAccessToken(ctx context.Context, code, clientID, clientSecret string) (*AuthResponse, error) {
+	res, err := s.metaRequest(ctx, nil, http.MethodGet, fmt.Sprintf("%s?code=%s&client_id=%s&client_secret=%s", oAuthAccessTokenEndpoint, code, clientID, clientSecret))
 	if err != nil {
 		return nil, err
 	}

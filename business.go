@@ -1,6 +1,7 @@
 package whatsapp_business
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ type BusinessResponse struct {
 	*ErrorResponse
 }
 
-func (s *Client) GetBusiness(businessAccountId string) (*BusinessResponse, error) {
-	res, err := s.metaRequestWithToken(nil, http.MethodGet, fmt.Sprintf("%s", businessAccountId))
+func (s *Client) GetBusiness(ctx context.Context, businessAccountId string) (*BusinessResponse, error) {
+	res, err := s.metaRequestWithToken(ctx, nil, http.MethodGet, fmt.Sprintf("%s", businessAccountId))
 	if err != nil {
 		return nil, err
 	}
@@ -32,8 +33,8 @@ func (s *Client) GetBusiness(businessAccountId string) (*BusinessResponse, error
 	return &toReturn, nil
 }
 
-func (s *Client) SetBusinessWebhook(businessAccountId string, request *SetWebhookConfig) (*SetBusinessWebhookResponse, error) {
-	res, err := s.metaRequestWithToken(SetBusinessWebhookRequest{
+func (s *Client) SetBusinessWebhook(ctx context.Context, businessAccountId string, request *SetWebhookConfig) (*SetBusinessWebhookResponse, error) {
+	res, err := s.metaRequestWithToken(ctx, SetBusinessWebhookRequest{
 		WebhookConfiguration: *request,
 	}, http.MethodPost, fmt.Sprintf(businessSubscribedApps, businessAccountId))
 	if err != nil {

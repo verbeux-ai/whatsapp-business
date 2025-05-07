@@ -20,7 +20,7 @@ type Option func(*Client)
 // NewClient creates a new client with the provided options
 func NewClient(opts ...Option) *Client {
 	c := &Client{
-		baseUrl:    "https://graph.facebook.com/v20.0",
+		baseUrl:    "https://graph.facebook.com/v22.0",
 		httpClient: http.DefaultClient,
 	}
 
