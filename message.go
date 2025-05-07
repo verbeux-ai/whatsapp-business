@@ -6,8 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-
-	"github.com/verbeux-ai/whatsapp-business/listener"
 )
 
 type messageRecipientType string
@@ -83,9 +81,14 @@ type contentMessageResponse struct {
 	Id string `json:"id"`
 }
 
+type contactMessageResponse struct {
+	Input string `json:"input"`
+	WaId  string `json:"wa_id"`
+}
+
 type MessageResponse struct {
 	MessagingProduct string                   `json:"messaging_product"`
-	Contacts         []listener.Contact       `json:"contacts"`
+	Contacts         []contactMessageResponse `json:"contacts"`
 	Messages         []contentMessageResponse `json:"messages"`
 	*ErrorResponse
 }
