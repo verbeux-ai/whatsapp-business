@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/verbeux-ai/whatsapp-business/listener"
 )
 
 type messageRecipientType string
@@ -26,29 +28,29 @@ const (
 	messageStatusRead messageStatus = "read"
 )
 
-type messageRequestType string
+type MessageType string
 
 const (
-	textMessageType        messageRequestType = "text"
-	imageMessageType       messageRequestType = "image"
-	audioMessageType       messageRequestType = "audio"
-	videoMessageType       messageRequestType = "video"
-	documentMessageType    messageRequestType = "document"
-	interactiveMessageType messageRequestType = "interactive"
+	TextMessageType        MessageType = "text"
+	ImageMessageType       MessageType = "image"
+	AudioMessageType       MessageType = "audio"
+	VideoMessageType       MessageType = "video"
+	DocumentMessageType    MessageType = "document"
+	InteractiveMessageType MessageType = "interactive"
 )
 
 type baseMessageRequest struct {
 	MessagingProduct messagingProductType `json:"messaging_product"`
 	RecipientType    messageRecipientType `json:"recipient_type"`
 	To               string               `json:"to"`
-	Type             messageRequestType   `json:"type"`
+	Type             MessageType          `json:"type"`
 	Context          *MessageContext      `json:"context,omitempty"`
 }
 type MessageContext struct {
 	MessageId string `json:"message_id,omitempty"`
 }
 
-func newBaseMessageRequest(to string, t messageRequestType, options ...SendMessageOption) baseMessageRequest {
+func newBaseMessageRequest(to string, t MessageType, options ...SendMessageOption) baseMessageRequest {
 	result := baseMessageRequest{
 		MessagingProduct: whatsappMessagingProduct,
 		RecipientType:    individualRecipientType,
@@ -77,25 +79,20 @@ type TextMessage struct {
 	Body       string `json:"body"`
 }
 
-type contactMessageResponse struct {
-	Input string `json:"input"`
-	WaId  string `json:"wa_id"`
-}
-
 type contentMessageResponse struct {
 	Id string `json:"id"`
 }
 
 type MessageResponse struct {
 	MessagingProduct string                   `json:"messaging_product"`
-	Contacts         []contactMessageResponse `json:"contacts"`
+	Contacts         []listener.Contact       `json:"contacts"`
 	Messages         []contentMessageResponse `json:"messages"`
 	*ErrorResponse
 }
 
 func (s *Client) SendTextMessage(ctx context.Context, to string, d TextMessage, options ...SendMessageOption) (*MessageResponse, error) {
 	body := textMessageRequest{
-		baseMessageRequest: newBaseMessageRequest(to, textMessageType, options...),
+		baseMessageRequest: newBaseMessageRequest(to, TextMessageType, options...),
 		Text:               d,
 	}
 	return s.messageRequest(ctx, body, http.MethodPost)
@@ -114,7 +111,7 @@ type imageMessageRequest struct {
 
 func (s *Client) SendImageMessage(ctx context.Context, to string, d ImageMessage, options ...SendMessageOption) (*MessageResponse, error) {
 	body := imageMessageRequest{
-		baseMessageRequest: newBaseMessageRequest(to, imageMessageType, options...),
+		baseMessageRequest: newBaseMessageRequest(to, ImageMessageType, options...),
 		Image:              d,
 	}
 	return s.messageRequest(ctx, body, http.MethodPost)
@@ -133,7 +130,7 @@ type videoMessageRequest struct {
 
 func (s *Client) SendVideoMessage(ctx context.Context, to string, d VideoMessage, options ...SendMessageOption) (*MessageResponse, error) {
 	body := videoMessageRequest{
-		baseMessageRequest: newBaseMessageRequest(to, videoMessageType, options...),
+		baseMessageRequest: newBaseMessageRequest(to, VideoMessageType, options...),
 		Video:              d,
 	}
 	return s.messageRequest(ctx, body, http.MethodPost)
@@ -151,7 +148,7 @@ type audioMessageRequest struct {
 
 func (s *Client) SendAudioMessage(ctx context.Context, to string, d AudioMessage, options ...SendMessageOption) (*MessageResponse, error) {
 	body := audioMessageRequest{
-		baseMessageRequest: newBaseMessageRequest(to, audioMessageType, options...),
+		baseMessageRequest: newBaseMessageRequest(to, AudioMessageType, options...),
 		Audio:              d,
 	}
 	return s.messageRequest(ctx, body, http.MethodPost)
@@ -171,7 +168,7 @@ type DocumentMessageRequest struct {
 
 func (s *Client) SendDocumentMessage(ctx context.Context, to string, d DocumentMessage, options ...SendMessageOption) (*MessageResponse, error) {
 	body := DocumentMessageRequest{
-		baseMessageRequest: newBaseMessageRequest(to, documentMessageType, options...),
+		baseMessageRequest: newBaseMessageRequest(to, DocumentMessageType, options...),
 		Document:           d,
 	}
 	return s.messageRequest(ctx, body, http.MethodPost)
@@ -184,24 +181,24 @@ type InteractiveMessageRequest struct {
 
 func (s *Client) SendInteractiveMessage(ctx context.Context, to string, d InteractiveMessage, options ...SendMessageOption) (*MessageResponse, error) {
 	body := InteractiveMessageRequest{
-		baseMessageRequest: newBaseMessageRequest(to, interactiveMessageType, options...),
+		baseMessageRequest: newBaseMessageRequest(to, InteractiveMessageType, options...),
 		Interactive:        d,
 	}
 	return s.messageRequest(ctx, body, http.MethodPost)
 }
 
-type InteractiveMessageType string
+type InteractiveMessageInternalType string
 
 const (
-	InteractiveMessageTypeList InteractiveMessageType = "LIST"
+	InteractiveMessageTypeList InteractiveMessageInternalType = "LIST"
 )
 
 type InteractiveMessage struct {
-	Type   InteractiveMessageType   `json:"type"`
-	Header InteractiveMessageHeader `json:"header"`
-	Body   InteractiveMessageBody   `json:"body"`
-	Footer InteractiveMessageFooter `json:"footer"`
-	Action InteractiveMessageAction `json:"action"`
+	Type   InteractiveMessageInternalType `json:"type"`
+	Header InteractiveMessageHeader       `json:"header"`
+	Body   InteractiveMessageBody         `json:"body"`
+	Footer InteractiveMessageFooter       `json:"footer"`
+	Action InteractiveMessageAction       `json:"action"`
 }
 type InteractiveMessageHeaderType string
 
