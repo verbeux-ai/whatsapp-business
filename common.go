@@ -2,6 +2,7 @@ package whatsapp_business
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -17,27 +18,7 @@ type ErrorResponse struct {
 	} `json:"error"`
 }
 
-func (s *Client) metaRequestWithToken(reqBody any, method, endpoint string) (*http.Response, error) {
-	marshalledBody, err := json.Marshal(reqBody)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader := bytes.NewReader(marshalledBody)
-
-	url := fmt.Sprintf("%s/%s", s.baseUrl, endpoint)
-
-	req, err := http.NewRequest(method, url, bodyReader)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", "Bearer "+s.token)
-	req.Header.Set("Content-Type", "application/json")
-
-	return s.httpClient.Do(req)
-}
-
-func (s *Client) metaRequest(reqBody any, method, endpoint string) (*http.Response, error) {
+func (s *Client) metaRequestWithToken(ctx context.Context, reqBody any, method, endpoint string) (*http.Response, error) {
 	var bodyReader io.Reader
 	if reqBody != nil {
 		marshalledBody, err := json.Marshal(reqBody)
@@ -49,7 +30,30 @@ func (s *Client) metaRequest(reqBody any, method, endpoint string) (*http.Respon
 
 	url := fmt.Sprintf("%s/%s", s.baseUrl, endpoint)
 
-	req, err := http.NewRequest(method, url, bodyReader)
+	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+s.token)
+	req.Header.Set("Content-Type", "application/json")
+
+	return s.httpClient.Do(req)
+}
+
+func (s *Client) metaRequest(ctx context.Context, reqBody any, method, endpoint string) (*http.Response, error) {
+	var bodyReader io.Reader
+	if reqBody != nil {
+		marshalledBody, err := json.Marshal(reqBody)
+		if err != nil {
+			return nil, err
+		}
+		bodyReader = bytes.NewReader(marshalledBody)
+	}
+
+	url := fmt.Sprintf("%s/%s", s.baseUrl, endpoint)
+
+	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
 	if err != nil {
 		return nil, err
 	}

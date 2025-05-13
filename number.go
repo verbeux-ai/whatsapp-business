@@ -1,6 +1,7 @@
 package whatsapp_business
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -28,8 +29,8 @@ type PhoneNumberResponseWhatsappConfiguration struct {
 	Application             string `json:"application"`
 }
 
-func (s *Client) GetPhoneNumber(phoneID string) (*PhoneNumberResponse, error) {
-	res, err := s.metaRequestWithToken(nil, http.MethodGet, fmt.Sprintf("%s", phoneID))
+func (s *Client) GetPhoneNumber(ctx context.Context, phoneID string) (*PhoneNumberResponse, error) {
+	res, err := s.metaRequestWithToken(ctx, nil, http.MethodGet, fmt.Sprintf("%s", phoneID))
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +57,8 @@ type RegisterPhoneNumberResponse struct {
 	*ErrorResponse
 }
 
-func (s *Client) RegisterPhoneNumber(phoneID string, pin string) (*RegisterPhoneNumberResponse, error) {
-	res, err := s.metaRequestWithToken(RegisterPhoneNumberRequest{
+func (s *Client) RegisterPhoneNumber(ctx context.Context, phoneID string, pin string) (*RegisterPhoneNumberResponse, error) {
+	res, err := s.metaRequestWithToken(ctx, RegisterPhoneNumberRequest{
 		MessagingProduct: whatsappMessagingProduct,
 		Pin:              pin,
 	}, http.MethodPost, fmt.Sprintf(phoneNumberRegister, phoneID))
@@ -100,8 +101,8 @@ type SetBusinessWebhookResponse struct {
 	*ErrorResponse
 }
 
-func (s *Client) SetPhoneNumberWebhook(phoneID string, request *SetWebhookConfig) (*SetPhoneNumberWebhookResponse, error) {
-	res, err := s.metaRequestWithToken(SetPhoneNumberWebhookRequest{
+func (s *Client) SetPhoneNumberWebhook(ctx context.Context, phoneID string, request *SetWebhookConfig) (*SetPhoneNumberWebhookResponse, error) {
+	res, err := s.metaRequestWithToken(ctx, SetPhoneNumberWebhookRequest{
 		WebhookConfiguration: *request,
 	}, http.MethodPost, phoneID)
 	if err != nil {

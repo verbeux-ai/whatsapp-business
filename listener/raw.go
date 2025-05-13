@@ -2,95 +2,112 @@ package listener
 
 type RawMessage struct {
 	Object string     `json:"object"`
-	Entry  []rawEntry `json:"entry"`
+	Entry  []RawEntry `json:"entry"`
 }
 
-type rawEntry struct {
+type RawEntry struct {
 	ID      string      `json:"id"`
-	Changes []rawChange `json:"changes"`
+	Changes []RawChange `json:"changes"`
 }
 
-type rawChange struct {
-	Value rawValue `json:"value"`
+type RawChange struct {
+	Value RawValue `json:"value"`
 	Field string   `json:"field"`
 }
 
-type rawValue struct {
+type RawValue struct {
 	MessagingProduct string              `json:"messaging_product"`
-	Metadata         rawMetadata         `json:"metadata"`
-	Contacts         []rawContact        `json:"contacts"`
-	Messages         []rawMessageContent `json:"messages"`
-	Statuses         []rawStatus         `json:"statuses,omitempty"`
+	Metadata         RawMetadata         `json:"metadata"`
+	Contacts         []RawContact        `json:"contacts"`
+	Messages         []RawMessageContent `json:"messages"`
+	Statuses         []RawStatus         `json:"statuses,omitempty"`
 }
 
-type rawMetadata struct {
+type RawMetadata struct {
 	DisplayPhoneNumber string `json:"display_phone_number"`
 	PhoneNumberID      string `json:"phone_number_id"`
 }
 
-type rawContact struct {
-	Profile rawProfile `json:"profile"`
+type RawContact struct {
+	Profile RawProfile `json:"profile"`
 	WaID    string     `json:"wa_id"`
 }
 
-type rawProfile struct {
+type RawProfile struct {
 	Name string `json:"name"`
 }
 
-type rawMessageContent struct {
+type RawMessageContent struct {
 	From        string               `json:"from"`
 	ID          string               `json:"id"`
 	Timestamp   string               `json:"timestamp"`
 	Type        string               `json:"type"`
-	Text        *rawText             `json:"text,omitempty"`
-	Image       *rawImage            `json:"image,omitempty"`
-	Sticker     *rawSticker          `json:"sticker,omitempty"`
-	Location    *rawLocation         `json:"location,omitempty"`
-	Contacts    *[]rawMessageContact `json:"contacts,omitempty"`
-	Reaction    *rawReaction         `json:"reaction,omitempty"`
-	Interactive *rawInteractive      `json:"interactive,omitempty"`
-	Referral    *rawReferral         `json:"referral,omitempty"`
-	Order       *rawOrder            `json:"order,omitempty"`
-	System      *rawSystem           `json:"system,omitempty"`
-	Errors      *[]rawError          `json:"errors,omitempty"`
-	Context     *rawContext          `json:"context,omitempty"`
+	Text        *RawText             `json:"text,omitempty"`
+	Audio       *RawAudio            `json:"audio,omitempty"`
+	Document    *RawDocument         `json:"document,omitempty"`
+	Image       *RawImage            `json:"image,omitempty"`
+	Sticker     *RawSticker          `json:"sticker,omitempty"`
+	Location    *RawLocation         `json:"location,omitempty"`
+	Contacts    *[]RawMessageContact `json:"contacts,omitempty"`
+	Reaction    *RawReaction         `json:"reaction,omitempty"`
+	Interactive *RawInteractive      `json:"interactive,omitempty"`
+	Referral    *RawReferral         `json:"referral,omitempty"`
+	Order       *RawOrder            `json:"order,omitempty"`
+	System      *RawSystem           `json:"system,omitempty"`
+	Errors      *[]RawError          `json:"errors,omitempty"`
+	Context     *RawContext          `json:"context,omitempty"`
 }
 
-type rawText struct {
+type RawText struct {
 	Body string `json:"body"`
 }
 
-type rawImage struct {
+type RawDocument struct {
+	Caption  string `json:"caption"`
+	Filename string `json:"filename"`
+	ID       string `json:"id"`
+	MimeType string `json:"mime_type"`
+	Sha256   string `json:"sha256"`
+}
+
+type RawAudio struct {
+	ID       string `json:"id"`
+	MimeType string `json:"mime_type"`
+	Sha256   string `json:"sha256"`
+	Voice    bool   `json:"voice"`
+}
+
+type RawImage struct {
 	Caption  string `json:"caption"`
 	MimeType string `json:"mime_type"`
 	Sha256   string `json:"sha256"`
 	ID       string `json:"id"`
 }
 
-type rawSticker struct {
+type RawSticker struct {
 	MimeType string `json:"mime_type"`
 	Sha256   string `json:"sha256"`
 	ID       string `json:"id"`
 }
 
-type rawLocation struct {
+type RawLocation struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 	Name      string  `json:"name"`
 	Address   string  `json:"address"`
 }
 
-type rawMessageContact struct {
-	Addresses []rawAddress `json:"addresses,omitempty"`
+type RawMessageContact struct {
+	Addresses []RawAddress `json:"addresses,omitempty"`
 	Birthday  string       `json:"birthday,omitempty"`
-	Emails    []rawEmail   `json:"emails,omitempty"`
-	Name      rawName      `json:"name,omitempty"`
-	Org       rawOrg       `json:"org,omitempty"`
-	Phones    []rawPhone   `json:"phones,omitempty"`
-	Urls      []rawUrl     `json:"urls,omitempty"`
+	Emails    []RawEmail   `json:"emails,omitempty"`
+	Name      RawName      `json:"name,omitempty"`
+	Org       RawOrg       `json:"org,omitempty"`
+	Phones    []RawPhone   `json:"phones,omitempty"`
+	Urls      []RawUrl     `json:"urls,omitempty"`
 }
 
-type rawAddress struct {
+type RawAddress struct {
 	City        string `json:"city"`
 	Country     string `json:"country"`
 	CountryCode string `json:"country_code"`
@@ -100,12 +117,12 @@ type rawAddress struct {
 	Zip         string `json:"zip"`
 }
 
-type rawEmail struct {
+type RawEmail struct {
 	Email string `json:"email"`
 	Type  string `json:"type"`
 }
 
-type rawName struct {
+type RawName struct {
 	FormattedName string `json:"formatted_name"`
 	FirstName     string `json:"first_name"`
 	LastName      string `json:"last_name"`
@@ -114,46 +131,46 @@ type rawName struct {
 	Prefix        string `json:"prefix"`
 }
 
-type rawOrg struct {
+type RawOrg struct {
 	Company    string `json:"company"`
 	Department string `json:"department"`
 	Title      string `json:"title"`
 }
 
-type rawPhone struct {
+type RawPhone struct {
 	Phone string `json:"phone"`
 	WaID  string `json:"wa_id"`
 	Type  string `json:"type"`
 }
 
-type rawUrl struct {
+type RawUrl struct {
 	Url  string `json:"url"`
 	Type string `json:"type"`
 }
 
-type rawReaction struct {
+type RawReaction struct {
 	MessageID string `json:"message_id"`
 	Emoji     string `json:"emoji"`
 }
 
-type rawInteractive struct {
+type RawInteractive struct {
 	Type        string          `json:"type"`
-	ListReply   *rawListReply   `json:"list_reply,omitempty"`
-	ButtonReply *rawButtonReply `json:"button_reply,omitempty"`
+	ListReply   *RawListReply   `json:"list_reply,omitempty"`
+	ButtonReply *RawButtonReply `json:"button_reply,omitempty"`
 }
 
-type rawListReply struct {
+type RawListReply struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
 
-type rawButtonReply struct {
+type RawButtonReply struct {
 	ID    string `json:"id"`
 	Title string `json:"title"`
 }
 
-type rawReferral struct {
+type RawReferral struct {
 	SourceURL    string `json:"source_url"`
 	SourceID     string `json:"source_id"`
 	SourceType   string `json:"source_type"`
@@ -166,63 +183,63 @@ type rawReferral struct {
 	CtwaClid     string `json:"ctwa_clid"`
 }
 
-type rawOrder struct {
+type RawOrder struct {
 	CatalogID    string           `json:"catalog_id"`
-	ProductItems []rawProductItem `json:"product_items"`
+	ProductItems []RawProductItem `json:"product_items"`
 	Text         string           `json:"text"`
 }
 
-type rawProductItem struct {
+type RawProductItem struct {
 	ProductRetailerID string `json:"product_retailer_id"`
 	Quantity          string `json:"quantity"`
 	ItemPrice         string `json:"item_price"`
 	Currency          string `json:"currency"`
 }
 
-type rawSystem struct {
+type RawSystem struct {
 	Body    string `json:"body"`
 	NewWaID string `json:"new_wa_id"`
 	Type    string `json:"type"`
 }
 
-type rawError struct {
+type RawError struct {
 	Code    int    `json:"code"`
 	Details string `json:"details"`
 	Title   string `json:"title"`
 }
 
-type rawContext struct {
+type RawContext struct {
 	From            string              `json:"from"`
 	ID              string              `json:"id"`
-	ReferredProduct *rawReferredProduct `json:"referred_product,omitempty"`
+	ReferredProduct *RawReferredProduct `json:"referred_product,omitempty"`
 }
 
-type rawReferredProduct struct {
+type RawReferredProduct struct {
 	CatalogID         string `json:"catalog_id"`
 	ProductRetailerID string `json:"product_retailer_id"`
 }
 
-type rawStatus struct {
-	ID           string           `json:"id"`
-	Status       string           `json:"status"`
-	Timestamp    string           `json:"timestamp"`
-	RecipientID  string           `json:"recipient_id"`
-	Conversation *rawConversation `json:"conversation,omitempty"`
-	Pricing      *rawPricing      `json:"pricing,omitempty"`
-	Errors       *[]rawError      `json:"errors,omitempty"`
+type RawStatus struct {
+	ID           string          `json:"id"`
+	Status       string          `json:"status"`
+	Timestamp    string          `json:"timestamp"`
+	RecipientID  string          `json:"recipient_id"`
+	Conversation RawConversation `json:"conversation,omitempty"`
+	Pricing      RawPricing      `json:"pricing,omitempty"`
+	Errors       []RawError      `json:"errors,omitempty"`
 }
 
-type rawConversation struct {
+type RawConversation struct {
 	ID                  string    `json:"id"`
 	ExpirationTimestamp string    `json:"expiration_timestamp,omitempty"`
-	Origin              rawOrigin `json:"origin"`
+	Origin              RawOrigin `json:"origin"`
 }
 
-type rawOrigin struct {
+type RawOrigin struct {
 	Type string `json:"type"`
 }
 
-type rawPricing struct {
+type RawPricing struct {
 	Billable     bool   `json:"billable"`
 	PricingModel string `json:"pricing_model"`
 	Category     string `json:"category"`
