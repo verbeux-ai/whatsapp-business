@@ -251,7 +251,7 @@ func (s *Client) ReadMessage(ctx context.Context, messageID string) (*MessageRes
 		MessageId:        messageID,
 	}
 
-	return s.messageRequest(ctx, body, http.MethodPut)
+	return s.messageRequest(ctx, body, http.MethodPost)
 }
 
 func (s *Client) messageRequest(ctx context.Context, body any, method string) (*MessageResponse, error) {
