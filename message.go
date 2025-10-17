@@ -35,6 +35,7 @@ const (
 	VideoMessageType       MessageType = "video"
 	DocumentMessageType    MessageType = "document"
 	InteractiveMessageType MessageType = "interactive"
+	TemplateMessageType    MessageType = "template"
 )
 
 type baseMessageRequest struct {
@@ -236,6 +237,28 @@ type InteractiveMessageRow struct {
 	Id          string `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
+}
+
+type TemplateMessageRequest struct {
+	baseMessageRequest
+	Template TemplateMessage `json:"template"`
+}
+
+func (s *Client) SendTemplateMessage(ctx context.Context, to string, d TemplateMessage) (*MessageResponse, error) {
+	body := TemplateMessageRequest{
+		baseMessageRequest: newBaseMessageRequest(to, TemplateMessageType),
+		Template:           d,
+	}
+	return s.messageRequest(ctx, body, http.MethodPost)
+}
+
+type TemplateMessage struct {
+	Name     string               `json:"name"`
+	Language TemplateLanguageCode `json:"language"`
+}
+
+type TemplateLanguageCode struct {
+	Code string `json:"code"`
 }
 
 type readMessageRequest struct {
