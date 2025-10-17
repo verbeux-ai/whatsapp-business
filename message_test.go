@@ -19,6 +19,18 @@ func TestSendTextMessage(t *testing.T) {
 	require.NotEmpty(t, result)
 }
 
+func TestSendTemplateMessage(t *testing.T) {
+	ctx := context.Background()
+	result, err := client.SendTemplateMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.TemplateMessage{
+		Name: "hello_world",
+		Language: whatsapp_business.TemplateLanguageCode{
+			Code: "en_US",
+		},
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
 func TestSendTextMessageWithOption(t *testing.T) {
 	ctx := context.Background()
 	result, err := client.SendTextMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.TextMessage{
