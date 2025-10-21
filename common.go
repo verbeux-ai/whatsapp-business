@@ -18,7 +18,7 @@ type ErrorResponse struct {
 	} `json:"error"`
 }
 
-func (s *Client) metaRequestWithToken(ctx context.Context, reqBody any, method, endpoint string) (*http.Response, error) {
+func (s *Client) metaRequestWithToken(ctx context.Context, reqBody any, method, route string) (*http.Response, error) {
 	var bodyReader io.Reader
 	if reqBody != nil {
 		marshalledBody, err := json.Marshal(reqBody)
@@ -28,7 +28,7 @@ func (s *Client) metaRequestWithToken(ctx context.Context, reqBody any, method, 
 		bodyReader = bytes.NewReader(marshalledBody)
 	}
 
-	url := fmt.Sprintf("%s/%s", s.baseUrl, endpoint)
+	url := fmt.Sprintf("%s/%s", s.baseUrl, route)
 
 	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
 	if err != nil {
@@ -41,7 +41,18 @@ func (s *Client) metaRequestWithToken(ctx context.Context, reqBody any, method, 
 	return s.httpClient.Do(req)
 }
 
-func (s *Client) metaRequest(ctx context.Context, reqBody any, method, endpoint string) (*http.Response, error) {
+func (s *Client) metaDownloadFile(ctx context.Context, mediaURL string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, mediaURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+s.token)
+
+	return s.httpClient.Do(req)
+}
+
+func (s *Client) metaRequest(ctx context.Context, reqBody any, method, route string) (*http.Response, error) {
 	var bodyReader io.Reader
 	if reqBody != nil {
 		marshalledBody, err := json.Marshal(reqBody)
@@ -51,7 +62,7 @@ func (s *Client) metaRequest(ctx context.Context, reqBody any, method, endpoint 
 		bodyReader = bytes.NewReader(marshalledBody)
 	}
 
-	url := fmt.Sprintf("%s/%s", s.baseUrl, endpoint)
+	url := fmt.Sprintf("%s/%s", s.baseUrl, route)
 
 	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
 	if err != nil {
