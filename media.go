@@ -5,9 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"mime"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -57,6 +61,86 @@ func (s *Client) DownloadMedia(ctx context.Context, mediaURL string) (*DownloadM
 		resp,
 		fileName,
 	}, nil
+}
+
+type UploadFromURL struct {
+	URL string `json:"url"`
+}
+
+type UploadFromURLResponse struct {
+	ID string `json:"id"`
+	*ErrorResponse
+}
+
+func (s *Client) UploadFromURL(ctx context.Context, body UploadFromURL) (*UploadFromURLResponse, error) {
+	reqIn, err := http.NewRequestWithContext(ctx, http.MethodGet, body.URL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("build GET src: %w", err)
+	}
+
+	respIn, err := s.httpClient.Do(reqIn)
+	if err != nil {
+		return nil, fmt.Errorf("GET src: %w", err)
+	}
+
+	if respIn.StatusCode < 200 || respIn.StatusCode >= 300 {
+		defer respIn.Body.Close()
+		return nil, fmt.Errorf("GET src bad status: %s", respIn.Status)
+	}
+
+	mimeType := respIn.Header.Get("Content-Type")
+	if mimeType == "application/ogg" {
+		mimeType = "audio/ogg; codecs=opus"
+	}
+	filename := filepath.Base(body.URL)
+
+	pr, pw := io.Pipe()
+	mw := multipart.NewWriter(pw)
+
+	go func() {
+		defer respIn.Body.Close()
+		defer func() {
+			_ = mw.Close()
+			_ = pw.Close()
+		}()
+
+		if err := mw.WriteField("messaging_product", "whatsapp"); err != nil {
+			_ = pw.CloseWithError(fmt.Errorf("write field messaging_product: %w", err))
+			return
+		}
+
+		h := make(textproto.MIMEHeader)
+		h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, "file", filename))
+		h.Set("Content-Type", mimeType)
+
+		part, err := mw.CreatePart(h)
+		if err != nil {
+			_ = pw.CloseWithError(fmt.Errorf("create part: %w", err))
+			return
+		}
+
+		if _, err := io.Copy(part, respIn.Body); err != nil {
+			_ = pw.CloseWithError(fmt.Errorf("copy body: %w", err))
+			return
+		}
+	}()
+
+	resp, err := s.metaMultipartRequestWithToken(ctx, pr, mw.FormDataContentType(), http.MethodPost, fmt.Sprintf("%s/media", s.phoneNumberID))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var toReturn UploadFromURLResponse
+	if err = json.NewDecoder(resp.Body).Decode(&toReturn); err != nil {
+		return nil, err
+	}
+
+	if toReturn.ErrorResponse != nil {
+		return nil, errors.New(toReturn.ErrorResponse.Error.Message)
+	}
+
+	return &toReturn, nil
 }
 
 func guessFilename(resp *http.Response, urlStr, fallbackBase string) string {

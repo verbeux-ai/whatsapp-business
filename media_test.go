@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	whatsapp_business "github.com/verbeux-ai/whatsapp-business"
 )
 
 func TestClient_GetMedia(t *testing.T) {
@@ -36,4 +37,13 @@ func TestClient_DownloadMedia(t *testing.T) {
 	defer f.Close()
 	_, err = io.Copy(f, media.Body)
 	require.NoError(t, err)
+}
+
+func TestClient_UploadFromURL(t *testing.T) {
+	result, err := client.UploadFromURL(t.Context(), whatsapp_business.UploadFromURL{
+		URL: os.Getenv("AUDIO_TEST_CONTENT"),
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+	require.NotEmpty(t, result.ID)
 }
