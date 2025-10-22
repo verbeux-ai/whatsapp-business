@@ -239,26 +239,142 @@ type InteractiveMessageRow struct {
 	Description string `json:"description"`
 }
 
+type TemplateContext struct {
+}
+
 type TemplateMessageRequest struct {
 	baseMessageRequest
 	Template TemplateMessage `json:"template"`
 }
 
-func (s *Client) SendTemplateMessage(ctx context.Context, to string, d TemplateMessage) (*MessageResponse, error) {
+func (s *Client) SendTemplateMessage(ctx context.Context, to string, template TemplateMessage, options ...TemplateOption) (*MessageResponse, error) {
+
+	for _, opt := range options {
+		opt(&template)
+	}
+
 	body := TemplateMessageRequest{
 		baseMessageRequest: newBaseMessageRequest(to, TemplateMessageType),
-		Template:           d,
+		Template:           template,
 	}
+
 	return s.messageRequest(ctx, body, http.MethodPost)
 }
 
 type TemplateMessage struct {
-	Name     string               `json:"name"`
-	Language TemplateLanguageCode `json:"language"`
+	Name       string               `json:"name" validate:"required"`
+	Language   TemplateLanguageCode `json:"language" validate:"required"`
+	Components []TemplateComponents `json:"components,omitempty" validate:"omitempty"`
 }
 
 type TemplateLanguageCode struct {
 	Code string `json:"code"`
+}
+
+type TemplateComponentType string
+
+const (
+	TemplateComponentTypeHeader TemplateComponentType = "header"
+	TemplateComponentTypeBody   TemplateComponentType = "body"
+	TemplateComponentTypeButton TemplateComponentType = "button"
+)
+
+type TemplateComponentParameterType string
+
+const (
+	TemplateComponentParameterText     TemplateComponentParameterType = "text"
+	TemplateComponentParameterImage    TemplateComponentParameterType = "image"
+	TemplateComponentParameterDocument TemplateComponentParameterType = "document"
+	TemplateComponentParameterVideo    TemplateComponentParameterType = "video"
+	TemplateComponentParameterPayload  TemplateComponentParameterType = "payload"
+	TemplateComponentParameterDateTime TemplateComponentParameterType = "date_time"
+	TemplateComponentParameterCurrency TemplateComponentParameterType = "currency"
+)
+
+type TemplateComponentButtonSubType string
+
+const (
+	TemplateComponentButtonSubTypeURL        TemplateComponentButtonSubType = "url"
+	TemplateComponentButtonSubTypeQuickReply TemplateComponentButtonSubType = "quick_reply"
+)
+
+type TemplateComponents struct {
+	Type       TemplateComponentType          `json:"type" validate:"required"`
+	SubType    TemplateComponentButtonSubType `json:"sub_type,omitempty"`
+	Index      string                         `json:"index,omitempty"`
+	Parameters []TemplateComponentParameter   `json:"parameters" validate:"required"`
+}
+
+type TemplateComponentParameter struct {
+	Type     TemplateComponentParameterType          `json:"type"`
+	Text     *string                                 `json:"text,omitempty"`
+	Image    *TemplateComponentParameterTypeImage    `json:"image,omitempty"`
+	Video    *TemplateComponentParameterTypeVideo    `json:"video,omitempty"`
+	Document *TemplateComponentParameterTypeDocument `json:"document,omitempty"`
+	Payload  *string                                 `json:"payload,omitempty"`
+	DateTime *TemplateComponentParameterTypeDateTime `json:"date_time,omitempty"`
+	Currency *TemplateComponentParameterTypeCurrency `json:"currency,omitempty"`
+}
+
+func (p TemplateComponentParameter) MarshalJSON() ([]byte, error) {
+	m := make(map[string]interface{})
+	m["type"] = p.Type
+
+	switch p.Type {
+	case TemplateComponentParameterText:
+		if p.Text != nil {
+			m["text"] = p.Text
+		}
+	case TemplateComponentParameterImage:
+		if p.Image != nil {
+			m["image"] = p.Image
+		}
+	case TemplateComponentParameterVideo:
+		if p.Video != nil {
+			m["video"] = p.Video
+		}
+	case TemplateComponentParameterDocument:
+		if p.Document != nil {
+			m["document"] = p.Document
+		}
+	case TemplateComponentParameterPayload:
+		if p.Payload != nil {
+			m["payload"] = p.Payload
+		}
+	case TemplateComponentParameterDateTime:
+		if p.DateTime != nil {
+			m["date_time"] = p.DateTime
+		}
+	case TemplateComponentParameterCurrency:
+		if p.Currency != nil {
+			m["currency"] = p.Currency
+		}
+	}
+
+	return json.Marshal(m)
+}
+
+type TemplateComponentParameterTypeImage struct {
+	Link string `json:"link" validate:"required"`
+}
+
+type TemplateComponentParameterTypeVideo struct {
+	Link string `json:"link" validate:"required"`
+}
+
+type TemplateComponentParameterTypeDocument struct {
+	Link     string `json:"link" validate:"required"`
+	Filename string `json:"filename" validate:"required"`
+}
+
+type TemplateComponentParameterTypeDateTime struct {
+	FallbackValue string `json:"fallback_value" validate:"required"`
+}
+
+type TemplateComponentParameterTypeCurrency struct {
+	FallbackValue string `json:"fallback_value" validate:"required"`
+	Code          string `json:"code" validate:"required"`
+	Amount1000    int    `json:"amount_1000" validate:"required"`
 }
 
 type readMessageRequest struct {
@@ -278,6 +394,14 @@ func (s *Client) ReadMessage(ctx context.Context, messageID string) (*MessageRes
 }
 
 func (s *Client) messageRequest(ctx context.Context, body any, method string) (*MessageResponse, error) {
+	// Log the request body for debugging purposes
+	jsonBody, err := json.MarshalIndent(body, "", "  ")
+	if err == nil {
+		fmt.Println("--- WhatsApp API Request Body ---")
+		fmt.Println(string(jsonBody))
+		fmt.Println("---------------------------------")
+	}
+
 	resp, err := s.metaRequestWithToken(ctx, body, method, fmt.Sprintf("%s/%s", s.phoneNumberID, messagesEndpoint))
 	if err != nil {
 		return nil, err

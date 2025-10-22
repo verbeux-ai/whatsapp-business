@@ -19,18 +19,6 @@ func TestSendTextMessage(t *testing.T) {
 	require.NotEmpty(t, result)
 }
 
-func TestSendTemplateMessage(t *testing.T) {
-	ctx := context.Background()
-	result, err := client.SendTemplateMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.TemplateMessage{
-		Name: "hello_world",
-		Language: whatsapp_business.TemplateLanguageCode{
-			Code: "en_US",
-		},
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, result)
-}
-
 func TestSendTextMessageWithOption(t *testing.T) {
 	ctx := context.Background()
 	result, err := client.SendTextMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.TextMessage{
@@ -73,6 +61,95 @@ func TestSendDocumentMessage(t *testing.T) {
 		Caption:  "Caption test",
 		Filename: "Filename test",
 	})
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
+func TestSendTemplateMessage(t *testing.T) {
+	ctx := context.Background()
+
+	template := whatsapp_business.TemplateMessage{
+		Name: "hello_world",
+		Language: whatsapp_business.TemplateLanguageCode{
+			Code: "en_US",
+		}}
+
+	result, err := client.SendTemplateMessage(ctx, os.Getenv("NUMBER"), template)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
+func TestSendTemplateMessageWithButtonURL(t *testing.T) {
+	ctx := context.Background()
+	result, err := client.SendTemplateMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.TemplateMessage{
+		Name: "hello_world",
+		Language: whatsapp_business.TemplateLanguageCode{
+			Code: "en_US",
+		},
+	},
+		whatsapp_business.WithButtonURL("0", os.Getenv("URL_TEST_CONTENT")),
+	)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
+func TestSendTemplateMessageWithHeaderDocument(t *testing.T) {
+	ctx := context.Background()
+	result, err := client.SendTemplateMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.TemplateMessage{
+		Name: "test_document",
+		Language: whatsapp_business.TemplateLanguageCode{
+			Code: "pt_BR",
+		},
+	},
+		whatsapp_business.WithHeaderDocument(os.Getenv("DOCUMENT_TEST_CONTENT"), "document.pdf"),
+	)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
+func TestSendTemplateMessageWithHeaderVideo(t *testing.T) {
+	ctx := context.Background()
+	result, err := client.SendTemplateMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.TemplateMessage{
+		Name: "test_video",
+		Language: whatsapp_business.TemplateLanguageCode{
+			Code: "pt_BR",
+		},
+	},
+		whatsapp_business.WithHeaderVideo(os.Getenv("VIDEO_TEST_CONTENT")),
+	)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
+func TestSendTemplateMessageWithHeaderImage(t *testing.T) {
+	ctx := context.Background()
+	result, err := client.SendTemplateMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.TemplateMessage{
+		Name: "test_image",
+		Language: whatsapp_business.TemplateLanguageCode{
+			Code: "pt_BR",
+		},
+	},
+		whatsapp_business.WithHeaderImage(os.Getenv("IMAGE_TEST_CONTENT")),
+	)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
+func TestSendTemplateMessageWithHeaderText(t *testing.T) {
+	ctx := context.Background()
+	result, err := client.SendTemplateMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.TemplateMessage{
+		Name: "test_text_with_variables",
+		Language: whatsapp_business.TemplateLanguageCode{
+			Code: "pt_BR",
+		},
+	},
+		whatsapp_business.WithHeaderText("Davi"),
+		whatsapp_business.WithBody(
+			whatsapp_business.NewTextParameter("Nome do Cliente"),
+			whatsapp_business.NewTextParameter("1000"),
+			whatsapp_business.NewTextParameter("22/10/2025"),
+		),
+	)
 	require.NoError(t, err)
 	require.NotEmpty(t, result)
 }
