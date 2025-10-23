@@ -8,6 +8,7 @@ type Client struct {
 	token      string
 	baseUrl    string
 	httpClient *http.Client
+	businessID string
 
 	// phoneNumberID is required
 	// WhatsApp user phone number.
@@ -49,6 +50,13 @@ func WithBaseUrl(baseUrl string) Option {
 func WithPhoneNumberId(phoneNumberId string) Option {
 	return func(c *Client) {
 		c.phoneNumberID = phoneNumberId
+	}
+}
+
+// WithBusinessId sets the wa business id of the client
+func WithBusinessId(businessId string) Option {
+	return func(c *Client) {
+		c.businessID = businessId
 	}
 }
 
