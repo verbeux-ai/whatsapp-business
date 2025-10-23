@@ -10,126 +10,51 @@ func WithReplyMessage(messageID string) SendMessageOption {
 
 type TemplateOption func(*TemplateMessage)
 
-func NewTextParameter(text string) TemplateComponentParameter {
-	return TemplateComponentParameter{
-		Type: TemplateComponentParameterText,
-		Text: &text,
-	}
-}
-
-func NewCurrencyParameter(fallback, code string, amount int) TemplateComponentParameter {
-	return TemplateComponentParameter{
-		Type: TemplateComponentParameterCurrency,
-		Currency: &TemplateComponentParameterTypeCurrency{
-			FallbackValue: fallback,
-			Code:          code,
-			Amount1000:    amount,
-		},
-	}
-}
-
-func NewDateTimeParameter(fallback string) TemplateComponentParameter {
-	return TemplateComponentParameter{
-		Type: TemplateComponentParameterDateTime,
-		DateTime: &TemplateComponentParameterTypeDateTime{
-			FallbackValue: fallback,
-		},
-	}
-}
-
-func WithHeaderText(text string) TemplateOption {
-	return func(tmpl *TemplateMessage) {
-		tmpl.Components = append(tmpl.Components, TemplateComponents{
-			Type: TemplateComponentTypeHeader,
-			Parameters: []TemplateComponentParameter{
-				{
-					Type: TemplateComponentParameterText,
-					Text: &text,
-				},
-			},
+func WithHeaderTextNamed(name, text string) TemplateOption {
+	return func(templateMessage *TemplateMessage) {
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeHeader, TemplateComponentParameter{
+			Type:          TemplateComponentParameterText,
+			Text:          &text,
+			ParameterName: name,
 		})
 	}
 }
 
-func WithHeaderImage(link string) TemplateOption {
-	return func(tmpl *TemplateMessage) {
-		tmpl.Components = append(tmpl.Components, TemplateComponents{
-			Type: TemplateComponentTypeHeader,
-			Parameters: []TemplateComponentParameter{
-				{
-					Type:  TemplateComponentParameterImage,
-					Image: &TemplateComponentParameterTypeImage{Link: link},
-				},
-			},
+func WithBodyTextNamed(name, text string) TemplateOption {
+	return func(templateMessage *TemplateMessage) {
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeBody, TemplateComponentParameter{
+			Type:          TemplateComponentParameterText,
+			Text:          &text,
+			ParameterName: name,
 		})
 	}
 }
 
-func WithHeaderVideo(link string) TemplateOption {
-	return func(tmpl *TemplateMessage) {
-		tmpl.Components = append(tmpl.Components, TemplateComponents{
-			Type: TemplateComponentTypeHeader,
-			Parameters: []TemplateComponentParameter{
-				{
-					Type:  TemplateComponentParameterVideo,
-					Video: &TemplateComponentParameterTypeVideo{Link: link},
-				},
-			},
-		})
+func pushComponents(components []TemplateComponents, templateType TemplateComponentType, toInsert ...TemplateComponentParameter) []TemplateComponents {
+	foundIndex := -1
+	for i, compt := range components {
+		if compt.Type == templateType {
+			foundIndex = i
+			break
+		}
 	}
-}
 
-func WithHeaderDocument(link, filename string) TemplateOption {
-	return func(tmpl *TemplateMessage) {
-		tmpl.Components = append(tmpl.Components, TemplateComponents{
-			Type: TemplateComponentTypeHeader,
-			Parameters: []TemplateComponentParameter{
-				{
-					Type:     TemplateComponentParameterDocument,
-					Document: &TemplateComponentParameterTypeDocument{Link: link, Filename: filename},
-				},
-			},
-		})
+	var actualParams []TemplateComponentParameter
+	if foundIndex != -1 {
+		actualParams = components[foundIndex].Parameters
 	}
-}
 
-func WithBody(params ...TemplateComponentParameter) TemplateOption {
-	return func(tmpl *TemplateMessage) {
-		tmpl.Components = append(tmpl.Components, TemplateComponents{
-			Type:       TemplateComponentTypeBody,
-			Parameters: params,
-		})
+	actualParams = append(actualParams, toInsert...)
+	newComponent := TemplateComponents{
+		Type:       templateType,
+		Parameters: actualParams,
 	}
-}
 
-func WithButtonURL(index, urlText string) TemplateOption {
-	return func(tmpl *TemplateMessage) {
-		tmpl.Components = append(tmpl.Components, TemplateComponents{
-			Type:    TemplateComponentTypeButton,
-			SubType: TemplateComponentButtonSubTypeURL,
-			Index:   index,
-			Parameters: []TemplateComponentParameter{
-				{
-					Type: TemplateComponentParameterText,
-					Text: &urlText,
-				},
-			},
-		})
+	if foundIndex == -1 {
+		components = append(components, newComponent)
+	} else {
+		components[foundIndex] = newComponent
 	}
-}
 
-func WithButtonQuickReply(index, payload string) TemplateOption {
-	return func(tmpl *TemplateMessage) {
-		tmpl.Components = append(tmpl.Components, TemplateComponents{
-			Type:    TemplateComponentTypeButton,
-			SubType: TemplateComponentButtonSubTypeQuickReply,
-			Index:   index,
-			Parameters: []TemplateComponentParameter{
-				{
-					Type:    TemplateComponentParameterPayload,
-					Payload: &payload,
-				},
-			},
-		})
-	}
+	return components
 }

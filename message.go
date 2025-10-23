@@ -249,7 +249,6 @@ type TemplateMessageRequest struct {
 }
 
 func (s *Client) SendTemplateMessage(ctx context.Context, to string, template TemplateMessage, options ...TemplateOption) (*MessageResponse, error) {
-
 	for _, opt := range options {
 		opt(&template)
 	}
@@ -302,57 +301,19 @@ const (
 type TemplateComponents struct {
 	Type       TemplateComponentType          `json:"type" validate:"required"`
 	SubType    TemplateComponentButtonSubType `json:"sub_type,omitempty"`
-	Index      string                         `json:"index,omitempty"`
 	Parameters []TemplateComponentParameter   `json:"parameters" validate:"required"`
 }
 
 type TemplateComponentParameter struct {
-	Type     TemplateComponentParameterType          `json:"type"`
-	Text     *string                                 `json:"text,omitempty"`
-	Image    *TemplateComponentParameterTypeImage    `json:"image,omitempty"`
-	Video    *TemplateComponentParameterTypeVideo    `json:"video,omitempty"`
-	Document *TemplateComponentParameterTypeDocument `json:"document,omitempty"`
-	Payload  *string                                 `json:"payload,omitempty"`
-	DateTime *TemplateComponentParameterTypeDateTime `json:"date_time,omitempty"`
-	Currency *TemplateComponentParameterTypeCurrency `json:"currency,omitempty"`
-}
-
-func (p TemplateComponentParameter) MarshalJSON() ([]byte, error) {
-	m := make(map[string]interface{})
-	m["type"] = p.Type
-
-	switch p.Type {
-	case TemplateComponentParameterText:
-		if p.Text != nil {
-			m["text"] = p.Text
-		}
-	case TemplateComponentParameterImage:
-		if p.Image != nil {
-			m["image"] = p.Image
-		}
-	case TemplateComponentParameterVideo:
-		if p.Video != nil {
-			m["video"] = p.Video
-		}
-	case TemplateComponentParameterDocument:
-		if p.Document != nil {
-			m["document"] = p.Document
-		}
-	case TemplateComponentParameterPayload:
-		if p.Payload != nil {
-			m["payload"] = p.Payload
-		}
-	case TemplateComponentParameterDateTime:
-		if p.DateTime != nil {
-			m["date_time"] = p.DateTime
-		}
-	case TemplateComponentParameterCurrency:
-		if p.Currency != nil {
-			m["currency"] = p.Currency
-		}
-	}
-
-	return json.Marshal(m)
+	Type          TemplateComponentParameterType          `json:"type"`
+	Text          *string                                 `json:"text,omitempty"`
+	Image         *TemplateComponentParameterTypeImage    `json:"image,omitempty"`
+	Video         *TemplateComponentParameterTypeVideo    `json:"video,omitempty"`
+	Document      *TemplateComponentParameterTypeDocument `json:"document,omitempty"`
+	Payload       *string                                 `json:"payload,omitempty"`
+	DateTime      *TemplateComponentParameterTypeDateTime `json:"date_time,omitempty"`
+	Currency      *TemplateComponentParameterTypeCurrency `json:"currency,omitempty"`
+	ParameterName string                                  `json:"parameter_name"`
 }
 
 type TemplateComponentParameterTypeImage struct {
