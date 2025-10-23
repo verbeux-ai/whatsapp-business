@@ -141,8 +141,9 @@ func (s *Client) SendVideoMessage(ctx context.Context, to string, d VideoMessage
 }
 
 type AudioMessage struct {
-	Link string `json:"link"`
-	ID   string `json:"id"`
+	Link  string `json:"link"`
+	ID    string `json:"id,omitempty"`
+	Voice bool   `json:"voice,omitempty"`
 }
 
 type audioMessageRequest struct {

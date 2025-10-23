@@ -54,6 +54,23 @@ func TestSendAudioMessage(t *testing.T) {
 	require.NotEmpty(t, result)
 }
 
+func TestSendAudioWithIdMessage(t *testing.T) {
+	mediaResult, err := client.UploadFromURL(t.Context(), whatsapp_business.UploadFromURL{
+		URL: os.Getenv("AUDIO_TEST_CONTENT"),
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, mediaResult)
+	require.NotEmpty(t, mediaResult.ID)
+
+	ctx := context.Background()
+	result, err := client.SendAudioMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.AudioMessage{
+		ID:    mediaResult.ID,
+		Voice: true,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
 func TestSendDocumentMessage(t *testing.T) {
 	ctx := context.Background()
 	result, err := client.SendDocumentMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.DocumentMessage{
