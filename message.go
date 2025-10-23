@@ -395,14 +395,6 @@ func (s *Client) ReadMessage(ctx context.Context, messageID string) (*MessageRes
 }
 
 func (s *Client) messageRequest(ctx context.Context, body any, method string) (*MessageResponse, error) {
-	// Log the request body for debugging purposes
-	jsonBody, err := json.MarshalIndent(body, "", "  ")
-	if err == nil {
-		fmt.Println("--- WhatsApp API Request Body ---")
-		fmt.Println(string(jsonBody))
-		fmt.Println("---------------------------------")
-	}
-
 	resp, err := s.metaRequestWithToken(ctx, body, method, fmt.Sprintf("%s/%s", s.phoneNumberID, messagesEndpoint))
 	if err != nil {
 		return nil, err
