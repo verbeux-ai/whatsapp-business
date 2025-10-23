@@ -96,6 +96,20 @@ func TestSendTemplateMessage(t *testing.T) {
 	require.NotEmpty(t, result)
 }
 
+func TestSendTemplateButtonMessage(t *testing.T) {
+	ctx := context.Background()
+
+	template := whatsapp_business.TemplateMessage{
+		Name: "test_button",
+		Language: whatsapp_business.TemplateLanguageCode{
+			Code: "pt_BR",
+		}}
+
+	result, err := client.SendTemplateMessage(ctx, os.Getenv("NUMBER"), template)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
 func TestSendTemplateMessageHeaderWithVariables(t *testing.T) {
 	ctx := context.Background()
 	result, err := client.SendTemplateMessage(
