@@ -74,3 +74,14 @@ type StatusMessage struct {
 	Origin         Origin
 }
 type StatusMessageListener func(message *StatusMessage) error
+
+type ButtonMessage struct {
+	Contacts        []Contact
+	ID              string
+	Message         string
+	Payload         string
+	Time            time.Time
+	ToPhoneNumberId string
+}
+
+type ButtonMessageListener func(message *ButtonMessage) error

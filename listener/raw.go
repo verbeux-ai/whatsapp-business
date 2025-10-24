@@ -56,6 +56,12 @@ type RawMessageContent struct {
 	System      *RawSystem           `json:"system,omitempty"`
 	Errors      *[]RawError          `json:"errors,omitempty"`
 	Context     *RawContext          `json:"context,omitempty"`
+	Button      *RawButton           `json:"button,omitempty"`
+}
+
+type RawButton struct {
+	Payload string `json:"payload"`
+	Text    string `json:"text"`
 }
 
 type RawText struct {

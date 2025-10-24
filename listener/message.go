@@ -41,6 +41,15 @@ func (s *listener) ReadBodyAsync(RawBody io.ReadCloser) *sync.WaitGroup {
 							}
 						}(message, change, contacts)
 					}
+					if message.Button != nil && s.buttonMessageListener != nil {
+						wg.Add(1)
+						go func(message RawMessageContent, change RawChange, contacts []Contact) {
+							defer wg.Done()
+							if err := s.treatButton(message, change, contacts); err != nil {
+								s.chError <- err
+							}
+						}(message, change, contacts)
+					}
 					if message.Audio != nil && s.audioMessageListener != nil {
 						wg.Add(1)
 						go func(message RawMessageContent, change RawChange, contacts []Contact) {
@@ -105,6 +114,11 @@ func (s *listener) ReadBodySync(RawBody io.ReadCloser) error {
 			}
 
 			for _, message := range change.Value.Messages {
+				if message.Button != nil && s.buttonMessageListener != nil {
+					if err := s.treatButton(message, change, contacts); err != nil {
+						return err
+					}
+				}
 				if message.Text != nil && s.textMessageListener != nil {
 					if err := s.treatText(message, change, contacts); err != nil {
 						return err
@@ -138,6 +152,41 @@ func (s *listener) ReadBodySync(RawBody io.ReadCloser) error {
 	}
 
 	return nil
+}
+
+func (s *listener) treatButton(message RawMessageContent, change RawChange, contacts []Contact) error {
+	msg, err := s.treatButtonMessage(message, change.Value.Metadata)
+	if err != nil {
+		return err
+	}
+	msg.Contacts = contacts
+	if err := (*s.buttonMessageListener)(msg); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *listener) treatButtonMessage(data RawMessageContent, metaData RawMetadata) (*ButtonMessage, error) {
+	if data.Button == nil {
+		return nil, ErrEmptyMessage
+	}
+
+	content := data.Button.Text
+	payload := data.Button.Payload
+
+	messageTimeInt, err := strconv.ParseInt(data.Timestamp, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrTimestampInvalid, err)
+	}
+	messageTime := time.Unix(messageTimeInt, 0)
+
+	return &ButtonMessage{
+		ID:              data.ID,
+		Message:         content,
+		Payload:         payload,
+		Time:            messageTime,
+		ToPhoneNumberId: metaData.PhoneNumberID,
+	}, nil
 }
 
 func (s *listener) treatText(message RawMessageContent, change RawChange, contacts []Contact) error {

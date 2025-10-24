@@ -209,3 +209,40 @@ const statusesMessage = `{
     }
   ]
 }`
+
+const quickReplyMessage = `{
+  "object" : "whatsapp_business_account",
+  "entry" : [ {
+    "id" : "190897907451133",
+    "changes" : [ {
+      "value" : {
+        "messaging_product" : "whatsapp",
+        "metadata" : {
+          "display_phone_number" : "15550077211",
+          "phone_number_id" : "245796831949065"
+        },
+        "contacts" : [ {
+          "profile" : {
+            "name" : "Ivo"
+          },
+          "wa_id" : "558594138387"
+        } ],
+        "messages" : [ {
+          "context" : {
+            "from" : "15550077211",
+            "id" : "wamid.HBgMNTU4NTk0MTM4Mzg3FQIAERgSMzQ1RkZGNEI4MjhDNjNGNDZEAA=="
+          },
+          "from" : "558594138387",
+          "id" : "wamid.HBgMNTU4NTk0MTM4Mzg3FQIAEhgWM0VCMDI3MEYyQ0JGOUQ0NEZCOUU5MQA=",
+          "timestamp" : "1761312711",
+          "type" : "button",
+          "button" : {
+            "payload" : "Nao testei",
+            "text" : "Nao testei"
+          }
+        } ]
+      },
+      "field" : "messages"
+    } ]
+  } ]
+}`
