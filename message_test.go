@@ -147,6 +147,40 @@ func TestSendTemplateMessageHeaderBodyWithVariables(t *testing.T) {
 	require.NotEmpty(t, result)
 }
 
+func TestSendTemplateMessageImage(t *testing.T) {
+	ctx := context.Background()
+	result, err := client.SendTemplateMessage(
+		ctx,
+		os.Getenv("NUMBER"),
+		whatsapp_business.TemplateMessage{
+			Name: "test_image",
+			Language: whatsapp_business.TemplateLanguageCode{
+				Code: "pt_BR",
+			},
+		},
+		whatsapp_business.WithHeaderImageLink(os.Getenv("IMAGE_TEST_CONTENT")),
+	)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
+func TestSendTemplateMessageDocument(t *testing.T) {
+	ctx := context.Background()
+	result, err := client.SendTemplateMessage(
+		ctx,
+		os.Getenv("NUMBER"),
+		whatsapp_business.TemplateMessage{
+			Name: "test_document",
+			Language: whatsapp_business.TemplateLanguageCode{
+				Code: "pt_BR",
+			},
+		},
+		whatsapp_business.WithHeaderDocumentLink(os.Getenv("DOCUMENT_TEST_CONTENT")),
+	)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
 //
 //func TestSendTemplateMessageWithHeaderDocument(t *testing.T) {
 //	ctx := context.Background()
