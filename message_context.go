@@ -20,6 +20,34 @@ func WithHeaderTextNamed(name, text string) TemplateOption {
 	}
 }
 
+func WithHeaderImageLink(link string) TemplateOption {
+	return func(templateMessage *TemplateMessage) {
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeHeader, TemplateComponentParameter{
+			Type:  TemplateComponentParameterImage,
+			Image: &TemplateComponentParameterTypeImage{Link: link},
+		})
+	}
+}
+
+func WithHeaderDocumentLink(link string) TemplateOption {
+	return func(templateMessage *TemplateMessage) {
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeHeader, TemplateComponentParameter{
+			Type:     TemplateComponentParameterDocument,
+			Document: &TemplateComponentParameterTypeDocument{Link: link},
+		})
+	}
+}
+
+func WithHeaderVideoLink(name, link string) TemplateOption {
+	return func(templateMessage *TemplateMessage) {
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeHeader, TemplateComponentParameter{
+			Type:          TemplateComponentParameterVideo,
+			Video:         &TemplateComponentParameterTypeVideo{Link: link},
+			ParameterName: name,
+		})
+	}
+}
+
 func WithBodyTextNamed(name, text string) TemplateOption {
 	return func(templateMessage *TemplateMessage) {
 		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeBody, TemplateComponentParameter{
