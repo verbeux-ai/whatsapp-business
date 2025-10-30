@@ -274,33 +274,43 @@ type TemplateLanguageCode struct {
 type TemplateComponentType string
 
 const (
-	TemplateComponentTypeHeader TemplateComponentType = "header"
-	TemplateComponentTypeBody   TemplateComponentType = "body"
-	TemplateComponentTypeButton TemplateComponentType = "button"
+	TemplateComponentTypeHeader TemplateComponentType = "HEADER"
+	TemplateComponentTypeBody   TemplateComponentType = "BODY"
+	TemplateComponentTypeFooter TemplateComponentType = "FOOTER"
+	TemplateComponentTypeButton TemplateComponentType = "BUTTONS"
 )
 
 type TemplateComponentParameterType string
 
 const (
-	TemplateComponentParameterText     TemplateComponentParameterType = "text"
-	TemplateComponentParameterImage    TemplateComponentParameterType = "image"
-	TemplateComponentParameterDocument TemplateComponentParameterType = "document"
-	TemplateComponentParameterVideo    TemplateComponentParameterType = "video"
-	TemplateComponentParameterPayload  TemplateComponentParameterType = "payload"
-	TemplateComponentParameterDateTime TemplateComponentParameterType = "date_time"
-	TemplateComponentParameterCurrency TemplateComponentParameterType = "currency"
+	TemplateComponentParameterText     TemplateComponentParameterType = "TEXT"
+	TemplateComponentParameterImage    TemplateComponentParameterType = "IMAGE"
+	TemplateComponentParameterDocument TemplateComponentParameterType = "DOCUMENT"
+	TemplateComponentParameterVideo    TemplateComponentParameterType = "VIDEO"
+	TemplateComponentParameterPayload  TemplateComponentParameterType = "PAYLOAD"
+	TemplateComponentParameterDateTime TemplateComponentParameterType = "DATE_TIME"
+	TemplateComponentParameterCurrency TemplateComponentParameterType = "CURRENCY"
 )
 
 type TemplateComponentButtonSubType string
 
 const (
-	TemplateComponentButtonSubTypeURL        TemplateComponentButtonSubType = "url"
-	TemplateComponentButtonSubTypeQuickReply TemplateComponentButtonSubType = "quick_reply"
+	TemplateComponentButtonSubTypeURL        TemplateComponentButtonSubType = "URL"
+	TemplateComponentButtonSubTypeQuickReply TemplateComponentButtonSubType = "QUICK_REPLY"
+)
+
+type TemplateComponentFormatType string
+
+const (
+	TemplateComponentFormatTypeText  TemplateComponentFormatType = "TEXT"
+	TemplateComponentFormatTypeImage TemplateComponentFormatType = "IMAGE"
 )
 
 type TemplateComponents struct {
 	Type       TemplateComponentType          `json:"type" validate:"required"`
+	Format     TemplateComponentFormatType    `json:"format,omitempty"`
 	SubType    TemplateComponentButtonSubType `json:"sub_type,omitempty"`
+	Text       string                         `json:"text,omitempty"`
 	Parameters []TemplateComponentParameter   `json:"parameters" validate:"required"`
 }
 
