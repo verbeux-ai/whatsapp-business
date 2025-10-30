@@ -97,8 +97,6 @@ func (s *Client) GetTemplate(ctx context.Context, name string, language string) 
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	fmt.Println("RAW API RESPONSE:", string(bodyBytes))
-
 	var toReturn ListTemplateResponse
 	if err = json.Unmarshal(bodyBytes, &toReturn); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
