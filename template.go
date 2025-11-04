@@ -5,12 +5,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 )
 
 type ListTemplateResponse struct {
 	Data   []TemplateData `json:"data"`
 	Paging Paging         `json:"paging"`
+	*ErrorResponse
+}
+
+type GetTemplateResponse struct {
+	Data   *TemplateData `json:"data"`
+	Paging Paging        `json:"paging"`
 	*ErrorResponse
 }
 
@@ -75,4 +82,33 @@ func (s *Client) ListTemplates(ctx context.Context) ([]TemplateData, error) {
 	}
 
 	return toReturn.Data, nil
+}
+
+func (s *Client) GetTemplate(ctx context.Context, name string, language string) (*TemplateData, error) {
+	queryString := fmt.Sprintf("message_templates?name=%s&language=%s", name, language)
+	resp, err := s.metaRequestWithToken(ctx, nil, http.MethodGet, fmt.Sprintf("%s/%s", s.businessID, queryString))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var toReturn ListTemplateResponse
+	if err = json.Unmarshal(bodyBytes, &toReturn); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	if toReturn.ErrorResponse != nil {
+		return nil, errors.New(toReturn.ErrorResponse.Error.Message)
+	}
+
+	if len(toReturn.Data) == 0 {
+		return nil, errors.New("template not found with specified name and language")
+	}
+
+	return &toReturn.Data[0], nil
 }

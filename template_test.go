@@ -11,3 +11,9 @@ func TestClient_ListTemplates(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, result)
 }
+
+func TestClient_GetTemplate(t *testing.T) {
+	result, err := client.GetTemplate(t.Context(), "hello_world", "en_US")
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
