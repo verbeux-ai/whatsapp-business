@@ -53,7 +53,7 @@ func (s *TemplateMessage) buildSubstitutedText(componentType TemplateComponentTy
 	return substituteParams(originalText, paramsMap)
 }
 
-func (s *TemplateMessage) BuildTextMessage(opts ...TemplateOption) *listener.TextMessage {
+func (s *TemplateMessage) BuildTextMessage(opts []TemplateOption) *listener.TextMessage {
 	headerText := s.buildSubstitutedText(TemplateComponentTypeHeader, opts...)
 	bodyText := s.buildSubstitutedText(TemplateComponentTypeBody, opts...)
 
@@ -68,11 +68,28 @@ func (s *TemplateMessage) BuildTextMessage(opts ...TemplateOption) *listener.Tex
 	}
 }
 
-func (s *TemplateMessage) BuildImageMessage(opts ...TemplateOption) *listener.ImageMessage {
+func (s *TemplateMessage) BuildImageMessage(opts []TemplateOption) *listener.ImageMessage {
 	finalCaption := s.buildSubstitutedText(TemplateComponentTypeBody, opts...)
 
 	return &listener.ImageMessage{
 		Caption: finalCaption,
 		Time:    time.Now(),
 	}
+}
+
+func (s *TemplateMessage) GetTemplateType(opts []TemplateOption) MessageType {
+	for _, opt := range opts {
+		opt(s)
+	}
+	for _, component := range s.Components {
+		for _, param := range component.Parameters {
+			switch param.Type {
+			case TemplateComponentParameterText:
+				return TextMessageType
+			case TemplateComponentParameterImage:
+				return ImageMessageType
+			}
+		}
+	}
+	return ""
 }
