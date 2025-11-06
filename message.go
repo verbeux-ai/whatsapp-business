@@ -195,7 +195,8 @@ func (s *Client) SendInteractiveMessage(ctx context.Context, to string, d Intera
 type InteractiveMessageInternalType string
 
 const (
-	InteractiveMessageTypeList InteractiveMessageInternalType = "LIST"
+	InteractiveMessageTypeList   InteractiveMessageInternalType = "LIST"
+	InteractiveMessageTypeButton InteractiveMessageInternalType = "BUTTON"
 )
 
 type InteractiveMessage struct {
@@ -225,8 +226,24 @@ type InteractiveMessageFooter struct {
 }
 
 type InteractiveMessageAction struct {
-	Button   string                      `json:"button"`
-	Sections []InteractiveMessageSection `json:"sections"`
+	Button   string                            `json:"button"`
+	Sections []InteractiveMessageSection       `json:"sections"`
+	Buttons  []InteractiveMessageSectionButton `json:"buttons"`
+}
+
+type InteractiveMessageSectionButtonType string
+
+const (
+	InteractiveMessageSectionButtonReplyType InteractiveMessageSectionButtonType = "reply"
+)
+
+type InteractiveMessageSectionButton struct {
+	Type  InteractiveMessageSectionButtonType  `json:"type"`
+	Reply InteractiveMessageSectionButtonReply `json:"reply"`
+}
+type InteractiveMessageSectionButtonReply struct {
+	Id    string `json:"id"`
+	Title string `json:"title"`
 }
 
 type InteractiveMessageSection struct {
