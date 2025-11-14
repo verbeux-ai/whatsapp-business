@@ -91,5 +91,5 @@ func (s *TemplateMessage) GetTemplateType(opts []TemplateOption) MessageType {
 			}
 		}
 	}
-	return ""
+	return TextMessageType
 }
