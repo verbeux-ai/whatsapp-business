@@ -200,11 +200,11 @@ const (
 )
 
 type InteractiveMessage struct {
-	Type   InteractiveMessageInternalType `json:"type"`
-	Header InteractiveMessageHeader       `json:"header"`
-	Body   InteractiveMessageBody         `json:"body"`
-	Footer InteractiveMessageFooter       `json:"footer"`
-	Action InteractiveMessageAction       `json:"action"`
+	Type   InteractiveMessageInternalType `json:"type,omitempty"`
+	Header *InteractiveMessageHeader      `json:"header,omitempty"`
+	Body   *InteractiveMessageBody        `json:"body,omitempty"`
+	Footer *InteractiveMessageFooter      `json:"footer,omitempty"`
+	Action *InteractiveMessageAction      `json:"action,omitempty"`
 }
 type InteractiveMessageHeaderType string
 

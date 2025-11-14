@@ -50,6 +50,15 @@ func (s *listener) ReadBodyAsync(RawBody io.ReadCloser) *sync.WaitGroup {
 							}
 						}(message, change, contacts)
 					}
+					if message.Interactive != nil && s.buttonMessageListener != nil {
+						wg.Add(1)
+						go func(message RawMessageContent, change RawChange, contacts []Contact) {
+							defer wg.Done()
+							if err := s.treatList(message, change, contacts); err != nil {
+								s.chError <- err
+							}
+						}(message, change, contacts)
+					}
 					if message.Audio != nil && s.audioMessageListener != nil {
 						wg.Add(1)
 						go func(message RawMessageContent, change RawChange, contacts []Contact) {
@@ -119,6 +128,11 @@ func (s *listener) ReadBodySync(RawBody io.ReadCloser) error {
 						return err
 					}
 				}
+				if message.Interactive != nil && s.buttonMessageListener != nil {
+					if err := s.treatList(message, change, contacts); err != nil {
+						return err
+					}
+				}
 				if message.Text != nil && s.textMessageListener != nil {
 					if err := s.treatText(message, change, contacts); err != nil {
 						return err
@@ -184,6 +198,40 @@ func (s *listener) treatButtonMessage(data RawMessageContent, metaData RawMetada
 		ID:              data.ID,
 		Message:         content,
 		Payload:         payload,
+		Time:            messageTime,
+		ToPhoneNumberId: metaData.PhoneNumberID,
+	}, nil
+}
+
+func (s *listener) treatList(message RawMessageContent, change RawChange, contacts []Contact) error {
+	msg, err := s.treatListMessage(message.Interactive, change.Value.Metadata, message.Timestamp, message.ID)
+	if err != nil {
+		return err
+	}
+	msg.Contacts = contacts
+	if err := (*s.buttonMessageListener)(msg); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *listener) treatListMessage(data *RawInteractive, metaData RawMetadata, timestamp, id string) (*ButtonMessage, error) {
+	if data.ListReply == nil {
+		return nil, ErrEmptyMessage
+	}
+
+	content := data.ListReply.Title + "\n" + data.ListReply.Description
+
+	messageTimeInt, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrTimestampInvalid, err)
+	}
+	messageTime := time.Unix(messageTimeInt, 0)
+
+	return &ButtonMessage{
+		ID:              id,
+		Message:         content,
+		Payload:         data.ListReply.ID,
 		Time:            messageTime,
 		ToPhoneNumberId: metaData.PhoneNumberID,
 	}, nil

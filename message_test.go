@@ -268,17 +268,17 @@ func TestSendInteractiveMessage(t *testing.T) {
 	ctx := context.Background()
 	result, err := client.SendInteractiveMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.InteractiveMessage{
 		Type: whatsapp_business.InteractiveMessageTypeList,
-		Header: whatsapp_business.InteractiveMessageHeader{
+		Header: &whatsapp_business.InteractiveMessageHeader{
 			Type: whatsapp_business.InteractiveMessageHeaderTypeText,
 			Text: "Test Header",
 		},
-		Body: whatsapp_business.InteractiveMessageBody{
+		Body: &whatsapp_business.InteractiveMessageBody{
 			Text: "Test body text",
 		},
-		Footer: whatsapp_business.InteractiveMessageFooter{
+		Footer: &whatsapp_business.InteractiveMessageFooter{
 			Text: "Test footer text",
 		},
-		Action: whatsapp_business.InteractiveMessageAction{
+		Action: &whatsapp_business.InteractiveMessageAction{
 			Button: "Choose an option",
 			Sections: []whatsapp_business.InteractiveMessageSection{
 				{
@@ -302,17 +302,17 @@ func TestSendButtonMessage(t *testing.T) {
 	ctx := context.Background()
 	result, err := client.SendInteractiveMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.InteractiveMessage{
 		Type: whatsapp_business.InteractiveMessageTypeButton,
-		Header: whatsapp_business.InteractiveMessageHeader{
+		Header: &whatsapp_business.InteractiveMessageHeader{
 			Type: whatsapp_business.InteractiveMessageHeaderTypeText,
 			Text: "Test Header",
 		},
-		Body: whatsapp_business.InteractiveMessageBody{
+		Body: &whatsapp_business.InteractiveMessageBody{
 			Text: "Test body text",
 		},
-		Footer: whatsapp_business.InteractiveMessageFooter{
+		Footer: &whatsapp_business.InteractiveMessageFooter{
 			Text: "Test footer text",
 		},
-		Action: whatsapp_business.InteractiveMessageAction{
+		Action: &whatsapp_business.InteractiveMessageAction{
 			Buttons: []whatsapp_business.InteractiveMessageSectionButton{
 				{
 					Type: whatsapp_business.InteractiveMessageSectionButtonReplyType,

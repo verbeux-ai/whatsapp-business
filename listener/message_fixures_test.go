@@ -246,3 +246,5 @@ const quickReplyMessage = `{
     } ]
   } ]
 }`
+
+const listMessage = `{"object":"whatsapp_business_account","entry":[{"id":"190897907451133","changes":[{"value":{"messaging_product":"whatsapp","metadata":{"display_phone_number":"15550077211","phone_number_id":"245796831949065"},"contacts":[{"profile":{"name":"Ivo"},"wa_id":"558594138387"}],"messages":[{"context":{"from":"15550077211","id":"wamid.HBgMNTU4NTk0MTM4Mzg3FQIAERgSRUEzNzVGMTM3RjIyMDBEQjAyAA=="},"from":"558594138387","id":"wamid.HBgMNTU4NTk0MTM4Mzg3FQIAEhgWM0VCMDZFRkVCOEQyOUYzRUI2RTcwNwA=","timestamp":"1763120309","type":"interactive","interactive":{"type":"list_reply","list_reply":{"id":"2","title":"Editar informa\u00e7\u00f5es","description":"Editar informa\u00e7\u00f5es"}}}]},"field":"messages"}]}]}`

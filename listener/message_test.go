@@ -127,3 +127,23 @@ func TestListener_OnQuickReplyMessage(t *testing.T) {
 	err := client.ReadBodySync(io.NopCloser(bytes.NewReader([]byte(quickReplyMessage))))
 	require.NoError(t, err)
 }
+
+func TestListener_OnListQuickReplyMessage(t *testing.T) {
+	client := listener.NewMessageListener()
+
+	client.OnButtonMessage(func(message *listener.ButtonMessage) error {
+		require.NotEmpty(t, message)
+		require.NotEmpty(t, message.Message)
+		require.NotEmpty(t, message.Payload)
+		require.NotEmpty(t, message.ID)
+		require.NotEmpty(t, message.Time)
+		require.NotEmpty(t, message.ToPhoneNumberId)
+		require.NotEmpty(t, message.Contacts)
+		require.NotEmpty(t, message.Contacts[0].Name)
+		require.NotEmpty(t, message.Contacts[0].WaID)
+		return nil
+	})
+
+	err := client.ReadBodySync(io.NopCloser(bytes.NewReader([]byte(listMessage))))
+	require.NoError(t, err)
+}
