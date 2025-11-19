@@ -36,6 +36,7 @@ const (
 	DocumentMessageType    MessageType = "document"
 	InteractiveMessageType MessageType = "interactive"
 	TemplateMessageType    MessageType = "template"
+	ListMessageType        MessageType = "list"
 )
 
 type baseMessageRequest struct {
