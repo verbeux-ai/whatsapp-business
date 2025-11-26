@@ -12,9 +12,9 @@ type TemplateOption func(*TemplateMessage)
 
 func WithHeaderTextNamed(name, text string) TemplateOption {
 	return func(templateMessage *TemplateMessage) {
-		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeHeader, TemplateComponentParameter{
-			Type:          TemplateComponentParameterText,
-			Text:          &text,
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateMessageComponentTypeHeader, TemplateMessageComponentParameter{
+			Type:          TemplateMessageComponentParameterText,
+			ParamText:     &text,
 			ParameterName: name,
 		})
 	}
@@ -22,27 +22,27 @@ func WithHeaderTextNamed(name, text string) TemplateOption {
 
 func WithHeaderImageLink(link string) TemplateOption {
 	return func(templateMessage *TemplateMessage) {
-		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeHeader, TemplateComponentParameter{
-			Type:  TemplateComponentParameterImage,
-			Image: &TemplateComponentParameterTypeImage{Link: link},
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateMessageComponentTypeHeader, TemplateMessageComponentParameter{
+			Type:  TemplateMessageComponentParameterImage,
+			Image: &TemplateMessageComponentParameterTypeImage{Link: link},
 		})
 	}
 }
 
 func WithHeaderDocumentLink(link string) TemplateOption {
 	return func(templateMessage *TemplateMessage) {
-		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeHeader, TemplateComponentParameter{
-			Type:     TemplateComponentParameterDocument,
-			Document: &TemplateComponentParameterTypeDocument{Link: link},
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateMessageComponentTypeHeader, TemplateMessageComponentParameter{
+			Type:     TemplateMessageComponentParameterDocument,
+			Document: &TemplateMessageComponentParameterTypeDocument{Link: link},
 		})
 	}
 }
 
 func WithHeaderVideoLink(name, link string) TemplateOption {
 	return func(templateMessage *TemplateMessage) {
-		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeHeader, TemplateComponentParameter{
-			Type:          TemplateComponentParameterVideo,
-			Video:         &TemplateComponentParameterTypeVideo{Link: link},
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateMessageComponentTypeHeader, TemplateMessageComponentParameter{
+			Type:          TemplateMessageComponentParameterVideo,
+			Video:         &TemplateMessageComponentParameterTypeVideo{Link: link},
 			ParameterName: name,
 		})
 	}
@@ -50,15 +50,15 @@ func WithHeaderVideoLink(name, link string) TemplateOption {
 
 func WithBodyTextNamed(name, text string) TemplateOption {
 	return func(templateMessage *TemplateMessage) {
-		templateMessage.Components = pushComponents(templateMessage.Components, TemplateComponentTypeBody, TemplateComponentParameter{
-			Type:          TemplateComponentParameterText,
-			Text:          &text,
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateMessageComponentTypeBody, TemplateMessageComponentParameter{
+			Type:          TemplateMessageComponentParameterText,
+			ParamText:     &text,
 			ParameterName: name,
 		})
 	}
 }
 
-func pushComponents(components []TemplateComponents, templateType TemplateComponentType, toInsert ...TemplateComponentParameter) []TemplateComponents {
+func pushComponents(components []TemplateMessageComponent, templateType TemplateMessageComponentType, toInsert ...TemplateMessageComponentParameter) []TemplateMessageComponent {
 	foundIndex := -1
 	for i, compt := range components {
 		if compt.Type == templateType {
@@ -67,13 +67,13 @@ func pushComponents(components []TemplateComponents, templateType TemplateCompon
 		}
 	}
 
-	var actualParams []TemplateComponentParameter
+	var actualParams []TemplateMessageComponentParameter
 	if foundIndex != -1 {
 		actualParams = components[foundIndex].Parameters
 	}
 
 	actualParams = append(actualParams, toInsert...)
-	newComponent := TemplateComponents{
+	newComponent := TemplateMessageComponent{
 		Type:       templateType,
 		Parameters: actualParams,
 	}

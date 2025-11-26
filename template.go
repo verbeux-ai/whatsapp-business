@@ -22,17 +22,17 @@ type GetTemplateResponse struct {
 }
 
 type TemplateData struct {
-	Name            string              `json:"name"`
-	ParameterFormat string              `json:"parameter_format"`
-	Components      []TemplateComponent `json:"components"`
-	Language        string              `json:"language"`
-	Status          string              `json:"status"`
-	Category        string              `json:"category"`
-	SubCategory     string              `json:"sub_category,omitempty"`
-	Id              string              `json:"id"`
+	Name            string                  `json:"name"`
+	ParameterFormat string                  `json:"parameter_format"`
+	Components      []TemplateDataComponent `json:"components"`
+	Language        string                  `json:"language"`
+	Status          string                  `json:"status"`
+	Category        string                  `json:"category"`
+	SubCategory     string                  `json:"sub_category,omitempty"`
+	Id              string                  `json:"id"`
 }
 
-type TemplateComponent struct {
+type TemplateDataComponent struct {
 	Type    string           `json:"type"`
 	Format  string           `json:"format,omitempty"`
 	Text    string           `json:"text,omitempty"`

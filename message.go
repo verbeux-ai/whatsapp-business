@@ -280,88 +280,88 @@ func (s *Client) SendTemplateMessage(ctx context.Context, to string, template Te
 }
 
 type TemplateMessage struct {
-	Name       string               `json:"name" validate:"required"`
-	Language   TemplateLanguageCode `json:"language" validate:"required"`
-	Components []TemplateComponents `json:"components,omitempty" validate:"omitempty"`
+	Name       string                     `json:"name" validate:"required"`
+	Language   TemplateLanguageCode       `json:"language" validate:"required"`
+	Components []TemplateMessageComponent `json:"components,omitempty" validate:"omitempty"`
 }
 
 type TemplateLanguageCode struct {
 	Code string `json:"code"`
 }
 
-type TemplateComponentType string
+type TemplateMessageComponentType string
 
 const (
-	TemplateComponentTypeHeader TemplateComponentType = "HEADER"
-	TemplateComponentTypeBody   TemplateComponentType = "BODY"
-	TemplateComponentTypeFooter TemplateComponentType = "FOOTER"
-	TemplateComponentTypeButton TemplateComponentType = "BUTTONS"
+	TemplateMessageComponentTypeHeader TemplateMessageComponentType = "HEADER"
+	TemplateMessageComponentTypeBody   TemplateMessageComponentType = "BODY"
+	TemplateMessageComponentTypeFooter TemplateMessageComponentType = "FOOTER"
+	TemplateMessageComponentTypeButton TemplateMessageComponentType = "BUTTONS"
 )
 
-type TemplateComponentParameterType string
+type TemplateMessageComponentParameterType string
 
 const (
-	TemplateComponentParameterText     TemplateComponentParameterType = "TEXT"
-	TemplateComponentParameterImage    TemplateComponentParameterType = "IMAGE"
-	TemplateComponentParameterDocument TemplateComponentParameterType = "DOCUMENT"
-	TemplateComponentParameterVideo    TemplateComponentParameterType = "VIDEO"
-	TemplateComponentParameterPayload  TemplateComponentParameterType = "PAYLOAD"
-	TemplateComponentParameterDateTime TemplateComponentParameterType = "DATE_TIME"
-	TemplateComponentParameterCurrency TemplateComponentParameterType = "CURRENCY"
+	TemplateMessageComponentParameterText     TemplateMessageComponentParameterType = "TEXT"
+	TemplateMessageComponentParameterImage    TemplateMessageComponentParameterType = "IMAGE"
+	TemplateMessageComponentParameterDocument TemplateMessageComponentParameterType = "DOCUMENT"
+	TemplateMessageComponentParameterVideo    TemplateMessageComponentParameterType = "VIDEO"
+	TemplateMessageComponentParameterPayload  TemplateMessageComponentParameterType = "PAYLOAD"
+	TemplateMessageComponentParameterDateTime TemplateMessageComponentParameterType = "DATE_TIME"
+	TemplateMessageComponentParameterCurrency TemplateMessageComponentParameterType = "CURRENCY"
 )
 
-type TemplateComponentButtonSubType string
+type TemplateMessageComponentButtonSubType string
 
 const (
-	TemplateComponentButtonSubTypeURL        TemplateComponentButtonSubType = "URL"
-	TemplateComponentButtonSubTypeQuickReply TemplateComponentButtonSubType = "QUICK_REPLY"
+	TemplateMessageComponentButtonSubTypeURL        TemplateMessageComponentButtonSubType = "URL"
+	TemplateMessageComponentButtonSubTypeQuickReply TemplateMessageComponentButtonSubType = "QUICK_REPLY"
 )
 
-type TemplateComponentFormatType string
+type TemplateMessageComponentFormatType string
 
 const (
-	TemplateComponentFormatTypeText  TemplateComponentFormatType = "TEXT"
-	TemplateComponentFormatTypeImage TemplateComponentFormatType = "IMAGE"
+	TemplateMessageComponentFormatTypeText  TemplateMessageComponentFormatType = "TEXT"
+	TemplateMessageComponentFormatTypeImage TemplateMessageComponentFormatType = "IMAGE"
 )
 
-type TemplateComponents struct {
-	Type       TemplateComponentType          `json:"type" validate:"required"`
-	Format     TemplateComponentFormatType    `json:"format,omitempty"`
-	SubType    TemplateComponentButtonSubType `json:"sub_type,omitempty"`
-	Text       string                         `json:"text,omitempty"`
-	Parameters []TemplateComponentParameter   `json:"parameters" validate:"required"`
+type TemplateMessageComponent struct {
+	Type          TemplateMessageComponentType          `json:"type" validate:"required"`
+	Format        TemplateMessageComponentFormatType    `json:"format,omitempty"`
+	SubType       TemplateMessageComponentButtonSubType `json:"sub_type,omitempty"`
+	ComponentText string                                `json:"component_text,omitempty"`
+	Parameters    []TemplateMessageComponentParameter   `json:"parameters,omitempty"`
 }
 
-type TemplateComponentParameter struct {
-	Type          TemplateComponentParameterType          `json:"type"`
-	Text          *string                                 `json:"text,omitempty"`
-	Image         *TemplateComponentParameterTypeImage    `json:"image,omitempty"`
-	Video         *TemplateComponentParameterTypeVideo    `json:"video,omitempty"`
-	Document      *TemplateComponentParameterTypeDocument `json:"document,omitempty"`
-	Payload       *string                                 `json:"payload,omitempty"`
-	DateTime      *TemplateComponentParameterTypeDateTime `json:"date_time,omitempty"`
-	Currency      *TemplateComponentParameterTypeCurrency `json:"currency,omitempty"`
-	ParameterName string                                  `json:"parameter_name"`
+type TemplateMessageComponentParameter struct {
+	Type          TemplateMessageComponentParameterType          `json:"type"`
+	ParamText     *string                                        `json:"param_text,omitempty"`
+	ParameterName string                                         `json:"parameter_name"`
+	Image         *TemplateMessageComponentParameterTypeImage    `json:"image,omitempty"`
+	Video         *TemplateMessageComponentParameterTypeVideo    `json:"video,omitempty"`
+	Document      *TemplateMessageComponentParameterTypeDocument `json:"document,omitempty"`
+	Payload       *string                                        `json:"payload,omitempty"`
+	DateTime      *TemplateMessageComponentParameterTypeDateTime `json:"date_time,omitempty"`
+	Currency      *TemplateMessageComponentParameterTypeCurrency `json:"currency,omitempty"`
 }
 
-type TemplateComponentParameterTypeImage struct {
+type TemplateMessageComponentParameterTypeImage struct {
 	Link string `json:"link" validate:"required"`
 }
 
-type TemplateComponentParameterTypeVideo struct {
+type TemplateMessageComponentParameterTypeVideo struct {
 	Link string `json:"link" validate:"required"`
 }
 
-type TemplateComponentParameterTypeDocument struct {
+type TemplateMessageComponentParameterTypeDocument struct {
 	Link     string `json:"link" validate:"required"`
 	Filename string `json:"filename" validate:"required"`
 }
 
-type TemplateComponentParameterTypeDateTime struct {
+type TemplateMessageComponentParameterTypeDateTime struct {
 	FallbackValue string `json:"fallback_value" validate:"required"`
 }
 
-type TemplateComponentParameterTypeCurrency struct {
+type TemplateMessageComponentParameterTypeCurrency struct {
 	FallbackValue string `json:"fallback_value" validate:"required"`
 	Code          string `json:"code" validate:"required"`
 	Amount1000    int    `json:"amount_1000" validate:"required"`
