@@ -40,6 +40,7 @@ func (s *MessageBuilder) buildOpts() *whatsapp_business.TemplateMessage {
 func (s *MessageBuilder) Build() (any, error) {
 	templateType := s.GetType()
 	templateMessage := s.buildOpts()
+	s.TemplateMessage = templateMessage
 	switch templateType {
 	case whatsapp_business.TextMessageType:
 		return s.buildText(templateMessage)
@@ -50,20 +51,11 @@ func (s *MessageBuilder) Build() (any, error) {
 }
 
 func (s *MessageBuilder) GetType() whatsapp_business.MessageType {
-	for _, component := range s.TemplateMessage.Components {
-		if component.Type == whatsapp_business.TemplateMessageComponentTypeHeader {
-			if len(component.Parameters) <= 0 {
-				continue
-			}
-			for _, param := range component.Parameters {
-				switch param.Type {
-				case whatsapp_business.TemplateMessageComponentParameterImage:
-					return whatsapp_business.ImageMessageType
-				case whatsapp_business.TemplateMessageComponentParameterVideo:
-					return whatsapp_business.VideoMessageType
-				case whatsapp_business.TemplateMessageComponentParameterDocument:
-					return whatsapp_business.DocumentMessageType
-				}
+	for _, component := range s.TemplateData.Components {
+		if component.Type == string(whatsapp_business.TemplateMessageComponentTypeHeader) {
+			switch component.Format {
+			case "IMAGE":
+				return whatsapp_business.ImageMessageType
 			}
 		}
 	}

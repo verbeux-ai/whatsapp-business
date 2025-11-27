@@ -30,14 +30,19 @@ func replaceParams(text string, params map[string]string) string {
 
 func (s *MessageBuilder) buildReplacedText(componentType whatsapp_business.TemplateMessageComponentType, templateMessage *whatsapp_business.TemplateMessage) (string, error) {
 	var originalText string
+	hasImage := false
 	for _, component := range s.TemplateData.Components {
+		if component.Format == "IMAGE" {
+			hasImage = true
+			continue
+		}
 		templateDataComponentType := string(componentType)
 		if component.Type == templateDataComponentType {
 			originalText = component.Text
 			break
 		}
 	}
-	if len(originalText) <= 0 {
+	if len(originalText) <= 0 && !hasImage {
 		err := fmt.Errorf("Component not found")
 		return "", err
 	}
