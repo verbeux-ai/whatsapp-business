@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 )
 
 type ListTemplateResponse struct {
@@ -65,14 +66,36 @@ type Cursors struct {
 	After  string `json:"after"`
 }
 
-func (s *Client) ListTemplates(ctx context.Context) ([]TemplateData, error) {
-	resp, err := s.metaRequestWithToken(ctx, nil, http.MethodGet, fmt.Sprintf("%s/message_templates", s.businessID))
+type ListTemplateFilter struct {
+	Limit uint64 `json:"limit"`
+	After string `json:"after"`
+}
+
+func (s *Client) ListTemplates(ctx context.Context, filter ListTemplateFilter) (*ListTemplateResponse, error) {
+	u, err := url.Parse(fmt.Sprintf("%s/message_templates", s.businessID))
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+
+	if filter.Limit > 0 {
+		q.Set("limit", fmt.Sprintf("%d", filter.Limit))
+	}
+
+	if filter.After != "" {
+		q.Set("after", filter.After)
+	}
+
+	u.RawQuery = q.Encode()
+
+	resp, err := s.metaRequestWithToken(ctx, nil, http.MethodGet, u.String())
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	var toReturn ListTemplateResponse
+	var toReturn *ListTemplateResponse
 	if err = json.NewDecoder(resp.Body).Decode(&toReturn); err != nil {
 		return nil, err
 	}
@@ -81,11 +104,11 @@ func (s *Client) ListTemplates(ctx context.Context) ([]TemplateData, error) {
 		return nil, errors.New(toReturn.ErrorResponse.Error.Message)
 	}
 
-	return toReturn.Data, nil
+	return toReturn, nil
 }
 
 func (s *Client) GetTemplate(ctx context.Context, name string, language string) (*TemplateData, error) {
-	queryString := fmt.Sprintf("message_templates?name=%s&language=%s", name, language)
+	queryString := fmt.Sprintf("message_templates?name=%s&language=%s&limit=1", name, language)
 	resp, err := s.metaRequestWithToken(ctx, nil, http.MethodGet, fmt.Sprintf("%s/%s", s.businessID, queryString))
 	if err != nil {
 		return nil, err
