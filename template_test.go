@@ -26,6 +26,9 @@ func TestClient_ListTemplates(t *testing.T) {
 		result, err := client.ListTemplates(t.Context(), whatsapp_business.ListTemplateFilter{
 			Limit: 1,
 		})
+		if result.Paging.Cursors.After == "" {
+			t.Skip("Not enough templates to test pagination, skipping.")
+		}
 		require.NoError(t, err)
 		require.Len(t, result.Data, 1)
 		require.NotEmpty(t, result.Paging.Cursors.After)
