@@ -66,9 +66,18 @@ type Cursors struct {
 	After  string `json:"after"`
 }
 
+type CategoryType string
+
+const (
+	MarketingCategory      CategoryType = "MARKETING"
+	UtilityCategory        CategoryType = "UTILITY"
+	AuthenticationCategory CategoryType = "AUTHENTICATION"
+)
+
 type ListTemplateFilter struct {
-	Limit uint64 `json:"limit"`
-	After string `json:"after"`
+	Limit    uint64       `json:"limit"`
+	After    string       `json:"after"`
+	Category CategoryType `json:"category"`
 }
 
 func (s *Client) ListTemplates(ctx context.Context, filter ListTemplateFilter) (*ListTemplateResponse, error) {
@@ -85,6 +94,10 @@ func (s *Client) ListTemplates(ctx context.Context, filter ListTemplateFilter) (
 
 	if filter.After != "" {
 		q.Set("after", filter.After)
+	}
+
+	if filter.Category != "" {
+		q.Set("category", string(filter.Category))
 	}
 
 	u.RawQuery = q.Encode()
