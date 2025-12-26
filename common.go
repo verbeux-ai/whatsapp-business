@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
 
 type ErrorResponse struct {
@@ -50,6 +51,28 @@ func (s *Client) metaMultipartRequestWithToken(ctx context.Context, body io.Read
 	}
 
 	req.Header.Set("Authorization", "Bearer "+s.token)
+	req.Header.Set("Content-Type", contentType)
+
+	return s.httpClient.Do(req)
+}
+
+func (s *Client) metaUploadRequestWithToken(ctx context.Context, body io.Reader, contentType, method, route string) (*http.Response, error) {
+	url := fmt.Sprintf("%s/%s", s.baseUrl, route)
+
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	if f, ok := body.(*os.File); ok {
+		stat, err := f.Stat()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get file stats: %w", err)
+		}
+		req.ContentLength = stat.Size()
+	}
+
+	req.Header.Set("Authorization", "OAuth "+s.token)
 	req.Header.Set("Content-Type", contentType)
 
 	return s.httpClient.Do(req)
