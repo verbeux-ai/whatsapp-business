@@ -268,6 +268,7 @@ func (s *listener) treatTextMessage(text RawMessageContent, metaData RawMetadata
 		Message:         content,
 		Time:            messageTime,
 		ToPhoneNumberId: metaData.PhoneNumberID,
+		Referral:        text.Referral,
 	}, nil
 }
 
