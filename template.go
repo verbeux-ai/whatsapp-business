@@ -162,9 +162,9 @@ const (
 type CategoryType string
 
 const (
-	MarketingCategory      CategoryType = "marketing"
-	UtilityCategory        CategoryType = "utility"
-	AuthenticationCategory CategoryType = "authentication"
+	MarketingCategory      CategoryType = "MARKETING"
+	UtilityCategory        CategoryType = "UTILITY"
+	AuthenticationCategory CategoryType = "AUTHENTICATION"
 )
 
 type CreateTemplateRequest struct {
