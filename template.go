@@ -53,6 +53,7 @@ type TemplateExample struct {
 	BodyText              [][]string   `json:"body_text,omitempty"`
 	BodyTextNamedParams   []NamedParam `json:"body_text_named_params,omitempty"`
 	HeaderHandle          []string     `json:"header_handle,omitempty"`
+	HeaderText            []string     `json:"header_text,omitempty"`
 }
 
 type NamedParam struct {
