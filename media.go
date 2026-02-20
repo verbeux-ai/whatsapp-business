@@ -10,8 +10,8 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
+	"net/url"
 	"path"
-	"path/filepath"
 	"strings"
 )
 
@@ -89,10 +89,18 @@ func (s *Client) UploadFromURL(ctx context.Context, body UploadFromURL) (*Upload
 	}
 
 	mimeType := respIn.Header.Get("Content-Type")
-	if mimeType == "application/ogg" {
+	if strings.Contains(mimeType, "ogg") {
 		mimeType = "audio/ogg; codecs=opus"
 	}
-	filename := filepath.Base(body.URL)
+
+	parsedURL, err := url.Parse(body.URL)
+	filename := "media_file"
+	if err == nil {
+		filename = path.Base(parsedURL.Path)
+	}
+	if filename == "." || filename == "/" {
+		filename = "upload.ogg"
+	}
 
 	pr, pw := io.Pipe()
 	mw := multipart.NewWriter(pw)
@@ -132,6 +140,60 @@ func (s *Client) UploadFromURL(ctx context.Context, body UploadFromURL) (*Upload
 	defer resp.Body.Close()
 
 	var toReturn UploadFromURLResponse
+	if err = json.NewDecoder(resp.Body).Decode(&toReturn); err != nil {
+		return nil, err
+	}
+
+	if toReturn.ErrorResponse != nil {
+		return nil, errors.New(toReturn.ErrorResponse.Error.Message)
+	}
+
+	return &toReturn, nil
+}
+
+type UploadFileResponse struct {
+	ID string `json:"id"`
+	*ErrorResponse
+}
+
+func (s *Client) UploadFile(ctx context.Context, reader io.Reader, filename string, mimeType string) (*UploadFileResponse, error) {
+	pr, pw := io.Pipe()
+	mw := multipart.NewWriter(pw)
+
+	go func() {
+		defer func() {
+			_ = mw.Close()
+			_ = pw.Close()
+		}()
+
+		if err := mw.WriteField("messaging_product", "whatsapp"); err != nil {
+			_ = pw.CloseWithError(fmt.Errorf("write field messaging_product: %w", err))
+			return
+		}
+
+		h := make(textproto.MIMEHeader)
+		h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, "file", filename))
+		h.Set("Content-Type", mimeType)
+
+		part, err := mw.CreatePart(h)
+		if err != nil {
+			_ = pw.CloseWithError(fmt.Errorf("create part: %w", err))
+			return
+		}
+
+		if _, err := io.Copy(part, reader); err != nil {
+			_ = pw.CloseWithError(fmt.Errorf("copy body: %w", err))
+			return
+		}
+	}()
+
+	resp, err := s.metaMultipartRequestWithToken(ctx, pr, mw.FormDataContentType(), http.MethodPost, fmt.Sprintf("%s/media", s.phoneNumberID))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var toReturn UploadFileResponse
 	if err = json.NewDecoder(resp.Body).Decode(&toReturn); err != nil {
 		return nil, err
 	}
