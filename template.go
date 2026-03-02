@@ -24,7 +24,7 @@ type GetTemplateResponse struct {
 
 type TemplateData struct {
 	Name            string                  `json:"name"`
-	ParameterFormat string                  `json:"parameter_format"`
+	ParameterFormat string                  `json:"parameter_format,omitempty"`
 	Components      []TemplateDataComponent `json:"components"`
 	Language        string                  `json:"language"`
 	Status          string                  `json:"status"`
@@ -42,12 +42,15 @@ type TemplateDataComponent struct {
 }
 
 type TemplateButton struct {
-	Type string `json:"type"`
-	Text string `json:"text"`
+	Type        string `json:"type"`
+	Text        string `json:"text"`
+	Url         string `json:"url,omitempty"`
+	PhoneNumber string `json:"phone_number,omitempty"`
 }
 
 type TemplateExample struct {
 	HeaderTextNamedParams []NamedParam `json:"header_text_named_params,omitempty"`
+	BodyText              [][]string   `json:"body_text,omitempty"`
 	BodyTextNamedParams   []NamedParam `json:"body_text_named_params,omitempty"`
 	HeaderHandle          []string     `json:"header_handle,omitempty"`
 }
@@ -66,18 +69,18 @@ type Cursors struct {
 	After  string `json:"after"`
 }
 
-type CategoryType string
+type CategoryTypeFilter string
 
 const (
-	MarketingCategory      CategoryType = "MARKETING"
-	UtilityCategory        CategoryType = "UTILITY"
-	AuthenticationCategory CategoryType = "AUTHENTICATION"
+	MarketingCategoryFilter      CategoryTypeFilter = "MARKETING"
+	UtilityCategoryFilter        CategoryTypeFilter = "UTILITY"
+	AuthenticationCategoryFilter CategoryTypeFilter = "AUTHENTICATION"
 )
 
 type ListTemplateFilter struct {
-	Limit    uint64       `json:"limit"`
-	After    string       `json:"after"`
-	Category CategoryType `json:"category"`
+	Limit    uint64             `json:"limit"`
+	After    string             `json:"after"`
+	Category CategoryTypeFilter `json:"category"`
 }
 
 func (s *Client) ListTemplates(ctx context.Context, filter ListTemplateFilter) (*ListTemplateResponse, error) {
@@ -153,4 +156,125 @@ func (s *Client) GetTemplate(ctx context.Context, name string, language string) 
 	}
 
 	return nil, errors.New("template not found with specified name and language")
+}
+
+type ParameterFormatType string
+
+const (
+	PositionalParameterFormat ParameterFormatType = "positional"
+	NamedParameterFormat      ParameterFormatType = "named"
+)
+
+type CategoryType string
+
+const (
+	MarketingCategory      CategoryType = "marketing"
+	UtilityCategory        CategoryType = "utility"
+	AuthenticationCategory CategoryType = "authentication"
+)
+
+type CreateTemplateRequest struct {
+	Name            string                  `json:"name"`
+	Category        CategoryType            `json:"category"`
+	Language        string                  `json:"language"`
+	Components      []TemplateDataComponent `json:"components"`
+	AllowCatChange  bool                    `json:"allow_category_change,omitempty"`
+	ParameterFormat ParameterFormatType     `json:"parameter_format,omitempty"`
+}
+
+type TemplateOperationResponse struct {
+	Id     string `json:"id"`
+	Status string `json:"status,omitempty"`
+	*ErrorResponse
+}
+
+type DeleteTemplateResponse struct {
+	Success bool `json:"success"`
+	*ErrorResponse
+}
+
+func (s *Client) CreateTemplate(ctx context.Context, req CreateTemplateRequest) (*TemplateOperationResponse, error) {
+	resp, err := s.metaRequestWithToken(ctx, req, http.MethodPost, fmt.Sprintf("%s/message_templates", s.businessID))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var toReturn TemplateOperationResponse
+	if err = json.Unmarshal(bodyBytes, &toReturn); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	if toReturn.ErrorResponse != nil {
+		return nil, errors.New(toReturn.ErrorResponse.Error.Message)
+	}
+
+	return &toReturn, nil
+}
+
+type UpdateTemplateRequest struct {
+	Category   CategoryType            `json:"category,omitempty"`
+	Components []TemplateDataComponent `json:"components,omitempty"`
+}
+
+func (s *Client) UpdateTemplate(ctx context.Context, templateID string, req UpdateTemplateRequest) (*TemplateOperationResponse, error) {
+	resp, err := s.metaRequestWithToken(ctx, req, http.MethodPost, templateID)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var toReturn TemplateOperationResponse
+	if err = json.Unmarshal(bodyBytes, &toReturn); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	if toReturn.ErrorResponse != nil {
+		return nil, errors.New(toReturn.ErrorResponse.Error.Message)
+	}
+
+	return &toReturn, nil
+}
+
+func (s *Client) DeleteTemplate(ctx context.Context, name string) (*DeleteTemplateResponse, error) {
+	u, err := url.Parse(fmt.Sprintf("%s/message_templates", s.businessID))
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+	q.Set("name", name)
+	u.RawQuery = q.Encode()
+
+	resp, err := s.metaRequestWithToken(ctx, nil, http.MethodDelete, u.String())
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var toReturn DeleteTemplateResponse
+	if err = json.Unmarshal(bodyBytes, &toReturn); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	if toReturn.ErrorResponse != nil {
+		return nil, errors.New(toReturn.ErrorResponse.Error.Message)
+	}
+
+	return &toReturn, nil
 }

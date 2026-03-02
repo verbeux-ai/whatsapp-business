@@ -10,7 +10,8 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
-	"net/url"
+  "net/url"
+	"os"
 	"path"
 	"strings"
 )
@@ -234,4 +235,64 @@ func guessFilename(resp *http.Response, urlStr, fallbackBase string) string {
 	}
 
 	return fallbackBase + ext
+}
+
+type CreateUploadSessionResponse struct {
+	Id string `json:"id"`
+	*ErrorResponse
+}
+
+type UploadImageResponse struct {
+	Handle string `json:"h"`
+	*ErrorResponse
+}
+
+func (s *Client) UploadPermanentImage(ctx context.Context, filePath string) (*UploadImageResponse, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get file info: %w", err)
+	}
+
+	fileSize := fileInfo.Size()
+	fileType := mime.TypeByExtension(filepath.Ext(filePath))
+
+	sessionURL := fmt.Sprintf("%s/uploads?file_length=%d&file_type=%s", s.appID, fileSize, fileType)
+	sessionResp, err := s.metaRequestWithToken(ctx, nil, http.MethodPost, sessionURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create upload session: %w", err)
+	}
+	defer sessionResp.Body.Close()
+
+	var session CreateUploadSessionResponse
+	if err := json.NewDecoder(sessionResp.Body).Decode(&session); err != nil {
+		return nil, fmt.Errorf("failed to decode session response: %w", err)
+	}
+
+	if session.ErrorResponse != nil {
+		return nil, errors.New(session.ErrorResponse.Error.Message)
+	}
+
+	uploadURL := session.Id
+	uploadResp, err := s.metaUploadRequestWithToken(ctx, file, fileType, http.MethodPost, uploadURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload file: %w", err)
+	}
+	defer uploadResp.Body.Close()
+
+	var upload UploadImageResponse
+	if err := json.NewDecoder(uploadResp.Body).Decode(&upload); err != nil {
+		return nil, fmt.Errorf("failed to decode upload response: %w", err)
+	}
+
+	if upload.ErrorResponse != nil {
+		return nil, errors.New(upload.ErrorResponse.Error.Message)
+	}
+
+	return &upload, nil
 }
