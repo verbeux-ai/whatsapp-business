@@ -149,7 +149,13 @@ func (s *Client) GetTemplate(ctx context.Context, name string, language string) 
 		return nil, errors.New("template not found with specified name and language")
 	}
 
-	return &toReturn.Data[0], nil
+	for _, dt := range toReturn.Data {
+		if dt.Name == name {
+			return &dt, nil
+		}
+	}
+
+	return nil, errors.New("template not found with specified name and language")
 }
 
 type ParameterFormatType string
