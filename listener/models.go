@@ -10,6 +10,7 @@ type TextMessage struct {
 	Message         string
 	Time            time.Time
 	ToPhoneNumberId string
+	Referral        *RawReferral
 }
 
 type TextMessageListener func(message *TextMessage) error
