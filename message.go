@@ -335,7 +335,7 @@ type TemplateMessageComponent struct {
 type TemplateMessageComponentParameter struct {
 	Type          TemplateMessageComponentParameterType          `json:"type"`
 	ParamText     *string                                        `json:"text,omitempty"`
-	ParameterName string                                         `json:"parameter_name"`
+	ParameterName string                                         `json:"parameter_name,omitempty"`
 	Image         *TemplateMessageComponentParameterTypeImage    `json:"image,omitempty"`
 	Video         *TemplateMessageComponentParameterTypeVideo    `json:"video,omitempty"`
 	Document      *TemplateMessageComponentParameterTypeDocument `json:"document,omitempty"`

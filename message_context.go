@@ -58,6 +58,15 @@ func WithBodyTextNamed(name, text string) TemplateOption {
 	}
 }
 
+func WithBodyText(text string) TemplateOption {
+	return func(templateMessage *TemplateMessage) {
+		templateMessage.Components = pushComponents(templateMessage.Components, TemplateMessageComponentTypeBody, TemplateMessageComponentParameter{
+			Type:      TemplateMessageComponentParameterText,
+			ParamText: &text,
+		})
+	}
+}
+
 func pushComponents(components []TemplateMessageComponent, templateType TemplateMessageComponentType, toInsert ...TemplateMessageComponentParameter) []TemplateMessageComponent {
 	foundIndex := -1
 	for i, compt := range components {
