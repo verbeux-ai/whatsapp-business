@@ -292,10 +292,11 @@ type TemplateLanguageCode struct {
 type TemplateMessageComponentType string
 
 const (
-	TemplateMessageComponentTypeHeader TemplateMessageComponentType = "HEADER"
-	TemplateMessageComponentTypeBody   TemplateMessageComponentType = "BODY"
-	TemplateMessageComponentTypeFooter TemplateMessageComponentType = "FOOTER"
-	TemplateMessageComponentTypeButton TemplateMessageComponentType = "BUTTONS"
+	TemplateMessageComponentTypeHeader       TemplateMessageComponentType = "HEADER"
+	TemplateMessageComponentTypeBody         TemplateMessageComponentType = "BODY"
+	TemplateMessageComponentTypeFooter       TemplateMessageComponentType = "FOOTER"
+	TemplateMessageComponentTypeButton       TemplateMessageComponentType = "BUTTONS"
+	TemplateMessageComponentTypeSingleButton TemplateMessageComponentType = "BUTTON"
 )
 
 type TemplateMessageComponentParameterType string
@@ -328,6 +329,7 @@ type TemplateMessageComponent struct {
 	Type          TemplateMessageComponentType          `json:"type" validate:"required"`
 	Format        TemplateMessageComponentFormatType    `json:"format,omitempty"`
 	SubType       TemplateMessageComponentButtonSubType `json:"sub_type,omitempty"`
+	Index         string                                `json:"index,omitempty"`
 	ComponentText string                                `json:"component_text,omitempty"`
 	Parameters    []TemplateMessageComponentParameter   `json:"parameters,omitempty"`
 }

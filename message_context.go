@@ -67,6 +67,22 @@ func WithBodyText(text string) TemplateOption {
 	}
 }
 
+func WithURLButton(index, text string) TemplateOption {
+	return func(templateMessage *TemplateMessage) {
+		templateMessage.Components = append(templateMessage.Components, TemplateMessageComponent{
+			Type:    TemplateMessageComponentTypeSingleButton,
+			SubType: TemplateMessageComponentButtonSubTypeURL,
+			Index:   index,
+			Parameters: []TemplateMessageComponentParameter{
+				{
+					Type:      TemplateMessageComponentParameterText,
+					ParamText: &text,
+				},
+			},
+		})
+	}
+}
+
 func pushComponents(components []TemplateMessageComponent, templateType TemplateMessageComponentType, toInsert ...TemplateMessageComponentParameter) []TemplateMessageComponent {
 	foundIndex := -1
 	for i, compt := range components {
