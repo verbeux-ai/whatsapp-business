@@ -385,6 +385,48 @@ func (s *Client) ReadMessage(ctx context.Context, messageID string) (*MessageRes
 	return s.messageRequest(ctx, body, http.MethodPost)
 }
 
+type SyncType string
+
+const (
+	SyncTypeHistory      SyncType = "HISTORY"
+	SyncTypeAppStateSync SyncType = "SMB_APP_STATE_SYNC"
+)
+
+type syncRequest struct {
+	MessagingProduct messagingProductType `json:"messaging_product"`
+	SyncType         SyncType             `json:"sync_type"`
+}
+
+type SyncResponse struct {
+	MessagingProduct string `json:"messaging_product"`
+	RequestID        string `json:"request_id"`
+	*ErrorResponse
+}
+
+func (s *Client) RequestSync(ctx context.Context, syncType SyncType) (*SyncResponse, error) {
+	body := syncRequest{
+		MessagingProduct: whatsappMessagingProduct,
+		SyncType:         syncType,
+	}
+
+	resp, err := s.metaRequestWithToken(ctx, body, http.MethodPost, fmt.Sprintf("%s/%s", s.phoneNumberID, messageHistoryEndpoint))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var toReturn SyncResponse
+	if err = json.NewDecoder(resp.Body).Decode(&toReturn); err != nil {
+		return nil, err
+	}
+
+	if toReturn.ErrorResponse != nil {
+		return nil, errors.New(toReturn.ErrorResponse.Error.Message)
+	}
+
+	return &toReturn, nil
+}
+
 func (s *Client) messageRequest(ctx context.Context, body any, method string) (*MessageResponse, error) {
 	resp, err := s.metaRequestWithToken(ctx, body, method, fmt.Sprintf("%s/%s", s.phoneNumberID, messagesEndpoint))
 	if err != nil {

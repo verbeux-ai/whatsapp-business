@@ -86,3 +86,152 @@ type ButtonMessage struct {
 }
 
 type ButtonMessageListener func(message *ButtonMessage) error
+
+type HistoryMessage struct {
+	ToPhoneNumberId string
+	History         []HistoryBlock
+}
+
+type HistoryBlock struct {
+	Phase      int
+	ChunkOrder int
+	Progress   int
+	Threads    []Thread
+}
+
+type Thread struct {
+	ID       string
+	Messages []ThreadMessage
+}
+
+type ThreadMessage struct {
+	From   string
+	ID     string
+	Time   time.Time
+	Type   string
+	Status string
+	FromMe bool
+
+	// Message content by type
+	Text     string
+	Audio    *AudioMessage
+	Image    *ImageMessage
+	Document *DocumentMessage
+	Video    *VideoMessage
+	Sticker  *StickerMessage
+	Location *LocationMessage
+	Reaction *ReactionMessage
+	Contacts []SharedContact
+	Errors   []MessageError
+	Context  *MessageContext
+	Edit     *MessageEdit
+}
+
+type SharedContact struct {
+	FirstName     string
+	FormattedName string
+	Phones        []SharedContactPhone
+}
+
+type SharedContactPhone struct {
+	Phone string
+	WaID  string
+	Type  string
+}
+
+type MessageError struct {
+	Code    int
+	Title   string
+	Message string
+	Details string
+}
+
+type MessageContext struct {
+	From      string
+	ID        string
+	Forwarded bool
+}
+
+type MessageEdit struct {
+	OriginalMessageID string
+	Type              string
+	Text              string
+}
+
+type StickerMessage struct {
+	ID       string
+	Mimetype string
+	Sha256   string
+}
+
+type LocationMessage struct {
+	Latitude  float64
+	Longitude float64
+	Name      string
+	Address   string
+}
+
+type ReactionMessage struct {
+	MessageID string
+	Emoji     string
+}
+
+type HistoryMessageListener func(message *HistoryMessage) error
+
+type ContactSyncMessage struct {
+	ToPhoneNumberId string
+	Events          []ContactSyncEvent
+}
+
+type ContactSyncEvent struct {
+	Type    string
+	Action  string
+	Contact *ContactSyncDetail
+	Time    time.Time
+	Version int
+}
+
+type ContactSyncDetail struct {
+	FullName    string
+	FirstName   string
+	PhoneNumber string
+}
+
+type ContactSyncMessageListener func(message *ContactSyncMessage) error
+
+type AccountUpdateEvent string
+
+const (
+	AccountUpdateVerified AccountUpdateEvent = "VERIFIED_ACCOUNT"
+)
+
+type AccountUpdateMessage struct {
+	PhoneNumber string
+	Event       AccountUpdateEvent
+}
+
+type AccountUpdateMessageListener func(message *AccountUpdateMessage) error
+
+type MessageEcho struct {
+	ID              string
+	From            string
+	To              string
+	Time            time.Time
+	Type            string
+	ToPhoneNumberId string
+
+	Text     string
+	Audio    *AudioMessage
+	Image    *ImageMessage
+	Document *DocumentMessage
+	Video    *VideoMessage
+	Sticker  *StickerMessage
+}
+
+type VideoMessage struct {
+	ID       string
+	Mimetype string
+	Sha256   string
+}
+
+type MessageEchoListener func(message *MessageEcho) error

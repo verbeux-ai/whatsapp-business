@@ -21,6 +21,11 @@ type RawValue struct {
 	Contacts         []RawContact        `json:"contacts"`
 	Messages         []RawMessageContent `json:"messages"`
 	Statuses         []RawStatus         `json:"statuses,omitempty"`
+	History          []RawHistory        `json:"history,omitempty"`
+	MessageEchoes    []RawMessageContent `json:"message_echoes,omitempty"`
+	StateSync        []RawStateSync      `json:"state_sync,omitempty"`
+	PhoneNumber      string              `json:"phone_number,omitempty"`
+	Event            string              `json:"event,omitempty"`
 }
 
 type RawMetadata struct {
@@ -38,25 +43,30 @@ type RawProfile struct {
 }
 
 type RawMessageContent struct {
-	From        string               `json:"from"`
-	ID          string               `json:"id"`
-	Timestamp   string               `json:"timestamp"`
-	Type        string               `json:"type"`
-	Text        *RawText             `json:"text,omitempty"`
-	Audio       *RawAudio            `json:"audio,omitempty"`
-	Document    *RawDocument         `json:"document,omitempty"`
-	Image       *RawImage            `json:"image,omitempty"`
-	Sticker     *RawSticker          `json:"sticker,omitempty"`
-	Location    *RawLocation         `json:"location,omitempty"`
-	Contacts    *[]RawMessageContact `json:"contacts,omitempty"`
-	Reaction    *RawReaction         `json:"reaction,omitempty"`
-	Interactive *RawInteractive      `json:"interactive,omitempty"`
-	Referral    *RawReferral         `json:"referral,omitempty"`
-	Order       *RawOrder            `json:"order,omitempty"`
-	System      *RawSystem           `json:"system,omitempty"`
-	Errors      *[]RawError          `json:"errors,omitempty"`
-	Context     *RawContext          `json:"context,omitempty"`
-	Button      *RawButton           `json:"button,omitempty"`
+	From           string               `json:"from"`
+	To             string               `json:"to,omitempty"`
+	FromUserID     string               `json:"from_user_id,omitempty"`
+	ID             string               `json:"id"`
+	Timestamp      string               `json:"timestamp"`
+	Type           string               `json:"type"`
+	HistoryContext *RawHistoryContext   `json:"history_context,omitempty"`
+	Text           *RawText             `json:"text,omitempty"`
+	Audio          *RawAudio            `json:"audio,omitempty"`
+	Document       *RawDocument         `json:"document,omitempty"`
+	Image          *RawImage            `json:"image,omitempty"`
+	Video          *RawVideo            `json:"video,omitempty"`
+	Sticker        *RawSticker          `json:"sticker,omitempty"`
+	Location       *RawLocation         `json:"location,omitempty"`
+	Contacts       *[]RawMessageContact `json:"contacts,omitempty"`
+	Reaction       *RawReaction         `json:"reaction,omitempty"`
+	Interactive    *RawInteractive      `json:"interactive,omitempty"`
+	Referral       *RawReferral         `json:"referral,omitempty"`
+	Order          *RawOrder            `json:"order,omitempty"`
+	System         *RawSystem           `json:"system,omitempty"`
+	Errors         *[]RawError          `json:"errors,omitempty"`
+	Context        *RawContext          `json:"context,omitempty"`
+	Button         *RawButton           `json:"button,omitempty"`
+	Edit           *RawEdit             `json:"edit,omitempty"`
 }
 
 type RawButton struct {
@@ -88,6 +98,12 @@ type RawImage struct {
 	MimeType string `json:"mime_type"`
 	Sha256   string `json:"sha256"`
 	ID       string `json:"id"`
+}
+
+type RawVideo struct {
+	ID       string `json:"id"`
+	MimeType string `json:"mime_type"`
+	Sha256   string `json:"sha256"`
 }
 
 type RawSticker struct {
@@ -209,20 +225,84 @@ type RawSystem struct {
 }
 
 type RawError struct {
-	Code    int    `json:"code"`
+	Code      int          `json:"code"`
+	Title     string       `json:"title"`
+	Message   string       `json:"message"`
+	ErrorData RawErrorData `json:"error_data,omitempty"`
+	Details   string       `json:"details"`
+}
+
+type RawErrorData struct {
 	Details string `json:"details"`
-	Title   string `json:"title"`
 }
 
 type RawContext struct {
 	From            string              `json:"from"`
 	ID              string              `json:"id"`
+	Forwarded       bool                `json:"forwarded,omitempty"`
 	ReferredProduct *RawReferredProduct `json:"referred_product,omitempty"`
 }
 
 type RawReferredProduct struct {
 	CatalogID         string `json:"catalog_id"`
 	ProductRetailerID string `json:"product_retailer_id"`
+}
+
+type RawHistory struct {
+	Metadata RawHistoryMetadata `json:"metadata"`
+	Threads  []RawThread        `json:"threads"`
+}
+
+type RawHistoryMetadata struct {
+	Phase      int `json:"phase"`
+	ChunkOrder int `json:"chunk_order"`
+	Progress   int `json:"progress"`
+}
+
+type RawThread struct {
+	ID       string              `json:"id"`
+	Context  RawThreadContext    `json:"context"`
+	Messages []RawMessageContent `json:"messages"`
+}
+
+type RawThreadContext struct {
+	WaID      string `json:"wa_id"`
+	UserID    string `json:"user_id"`
+	Username  string `json:"username"`
+	LogicalID string `json:"logical_id"`
+}
+
+type RawEdit struct {
+	OriginalMessageID string         `json:"original_message_id"`
+	Message           RawEditMessage `json:"message"`
+}
+
+type RawEditMessage struct {
+	Type string   `json:"type"`
+	Text *RawText `json:"text,omitempty"`
+}
+
+type RawHistoryContext struct {
+	Status string `json:"status"`
+	FromMe bool   `json:"from_me"`
+}
+
+type RawStateSync struct {
+	Type     string               `json:"type"`
+	Contact  *RawStateSyncContact `json:"contact,omitempty"`
+	Action   string               `json:"action"`
+	Metadata RawStateSyncMetadata `json:"metadata"`
+}
+
+type RawStateSyncContact struct {
+	FullName    string `json:"full_name"`
+	FirstName   string `json:"first_name"`
+	PhoneNumber string `json:"phone_number"`
+}
+
+type RawStateSyncMetadata struct {
+	Timestamp string `json:"timestamp"`
+	Version   int    `json:"version"`
 }
 
 type RawStatus struct {

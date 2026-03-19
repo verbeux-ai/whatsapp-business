@@ -248,3 +248,152 @@ const quickReplyMessage = `{
 }`
 
 const listMessage = `{"object":"whatsapp_business_account","entry":[{"id":"190897907451133","changes":[{"value":{"messaging_product":"whatsapp","metadata":{"display_phone_number":"15550077211","phone_number_id":"245796831949065"},"contacts":[{"profile":{"name":"Ivo"},"wa_id":"558594138387"}],"messages":[{"context":{"from":"15550077211","id":"wamid.HBgMNTU4NTk0MTM4Mzg3FQIAERgSRUEzNzVGMTM3RjIyMDBEQjAyAA=="},"from":"558594138387","id":"wamid.HBgMNTU4NTk0MTM4Mzg3FQIAEhgWM0VCMDZFRkVCOEQyOUYzRUI2RTcwNwA=","timestamp":"1763120309","type":"interactive","interactive":{"type":"list_reply","list_reply":{"id":"2","title":"Editar informa\u00e7\u00f5es","description":"Editar informa\u00e7\u00f5es"}}}]},"field":"messages"}]}]}`
+
+const messageEchoMessage = `{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "314019881790068",
+      "changes": [
+        {
+          "field": "smb_message_echoes",
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "558594138387",
+              "phone_number_id": "282416054963178"
+            },
+            "message_echoes": [
+              {
+                "from": "558594138387",
+                "to": "558599386799",
+                "id": "wamid.HBgMNTU4NTk0MTM4Mzg3FQIAERgUMkExOUE4REQ3NTU2RkQ0MzE3OEQA",
+                "timestamp": "1773937355",
+                "type": "audio",
+                "audio": {
+                  "mime_type": "audio/ogg; codecs=opus",
+                  "sha256": "VjPGU4hh1HHZIIMKTKMsrJIVjw0xumIgIJMXyU3Ihsg=",
+                  "id": "26243872851911592",
+                  "voice": true
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}`
+
+const accountUpdateMessage = `{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "190897907451133",
+      "changes": [
+        {
+          "field": "account_update",
+          "value": {
+            "phone_number": "16505551111",
+            "event": "VERIFIED_ACCOUNT"
+          }
+        }
+      ]
+    }
+  ]
+}`
+
+const contactSyncMessage = `{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "190897907451133",
+      "changes": [
+        {
+          "field": "smb_app_state_sync",
+          "value": {
+            "messaging_product": "whatsapp",
+            "state_sync": [
+              {
+                "type": "contact",
+                "contact": {
+                  "full_name": "John Doe",
+                  "first_name": "John",
+                  "phone_number": "3213213214"
+                },
+                "action": "add",
+                "metadata": {
+                  "timestamp": "1773945449482"
+                }
+              }
+            ],
+            "metadata": {
+              "display_phone_number": "16505551111",
+              "phone_number_id": "123123123"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}`
+
+const historyMessage = `{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "190897907451133",
+      "changes": [
+        {
+          "field": "history",
+          "value": {
+            "messaging_product": "whatsapp",
+            "history": [
+              {
+                "metadata": {
+                  "phase": 1,
+                  "chunk_order": 131,
+                  "progress": 30
+                },
+                "threads": [
+                  {
+                    "id": "1234567890",
+                    "messages": [
+                      {
+                        "from": "16505551111",
+                        "id": "ABGGFlA5Fpa",
+                        "timestamp": "1504902988",
+                        "type": "media_placeholder",
+                        "history_context": {
+                          "status": "read",
+                          "from_me": true
+                        }
+                      },
+                      {
+                        "from": "16315551181",
+                        "id": "ABGGFlA5Fpb",
+                        "timestamp": "1504902988",
+                        "type": "text",
+                        "text": {
+                          "body": "this is a text message"
+                        },
+                        "history_context": {
+                          "status": "delivered",
+                          "from_me": false
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "metadata": {
+              "display_phone_number": "16505551111",
+              "phone_number_id": "123123123"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}`

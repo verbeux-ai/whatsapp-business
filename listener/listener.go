@@ -8,12 +8,16 @@ import (
 type listener struct {
 	chError chan error
 
-	textMessageListener     *TextMessageListener
-	buttonMessageListener   *ButtonMessageListener
-	audioMessageListener    *AudioMessageListener
-	imageMessageListener    *ImageMessageListener
-	documentMessageListener *DocumentMessageListener
-	statusMessageListener   *StatusMessageListener
+	textMessageListener          *TextMessageListener
+	buttonMessageListener        *ButtonMessageListener
+	audioMessageListener         *AudioMessageListener
+	imageMessageListener         *ImageMessageListener
+	documentMessageListener      *DocumentMessageListener
+	statusMessageListener        *StatusMessageListener
+	historyMessageListener       *HistoryMessageListener
+	contactSyncMessageListener   *ContactSyncMessageListener
+	accountUpdateMessageListener *AccountUpdateMessageListener
+	messageEchoListener          *MessageEchoListener
 }
 
 func NewMessageListener() MessageListener {
@@ -49,6 +53,10 @@ type MessageListener interface {
 	OnImageMessage(ImageMessageListener)
 	OnDocumentMessage(DocumentMessageListener)
 	OnStatusMessage(StatusMessageListener)
+	OnHistoryMessage(HistoryMessageListener)
+	OnContactSyncMessage(ContactSyncMessageListener)
+	OnAccountUpdateMessage(AccountUpdateMessageListener)
+	OnMessageEcho(MessageEchoListener)
 	ReadBodyAsync(io.ReadCloser) *sync.WaitGroup
 	ReadBodySync(io.ReadCloser) error
 }
@@ -75,4 +83,20 @@ func (s *listener) OnDocumentMessage(listener DocumentMessageListener) {
 
 func (s *listener) OnStatusMessage(listener StatusMessageListener) {
 	s.statusMessageListener = &listener
+}
+
+func (s *listener) OnHistoryMessage(listener HistoryMessageListener) {
+	s.historyMessageListener = &listener
+}
+
+func (s *listener) OnContactSyncMessage(listener ContactSyncMessageListener) {
+	s.contactSyncMessageListener = &listener
+}
+
+func (s *listener) OnAccountUpdateMessage(listener AccountUpdateMessageListener) {
+	s.accountUpdateMessageListener = &listener
+}
+
+func (s *listener) OnMessageEcho(listener MessageEchoListener) {
+	s.messageEchoListener = &listener
 }

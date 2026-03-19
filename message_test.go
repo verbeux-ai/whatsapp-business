@@ -334,3 +334,45 @@ func TestSendButtonMessage(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, result)
 }
+
+func TestSendRawAudioMessage(t *testing.T) {
+	localAudioPath := os.Getenv("LOCAL_AUDIO_TO_CONVERT")
+	if localAudioPath == "" {
+		t.Skip("Variável LOCAL_AUDIO_TO_CONVERT não definida. Pulando teste.")
+	}
+
+	f, err := os.Open(localAudioPath)
+	require.NoError(t, err)
+	defer f.Close()
+
+	mediaResult, err := client.UploadFile(t.Context(), f, "audio.ogg", "audio/ogg; codecs=opus")
+	require.NoError(t, err)
+	require.NotEmpty(t, mediaResult)
+	require.NotEmpty(t, mediaResult.ID)
+
+	ctx := context.Background()
+	result, err := client.SendAudioMessage(ctx, os.Getenv("NUMBER"), whatsapp_business.AudioMessage{
+		ID:    mediaResult.ID,
+		Voice: true,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}
+
+func TestSendAuthTemplate(t *testing.T) {
+	ctx := context.Background()
+	result, err := client.SendTemplateMessage(
+		ctx,
+		os.Getenv("NUMBER"),
+		whatsapp_business.TemplateMessage{
+			Name: "auth",
+			Language: whatsapp_business.TemplateLanguageCode{
+				Code: "pt_BR",
+			},
+		},
+		whatsapp_business.WithBodyText("123456"),
+		whatsapp_business.WithURLButton("0", "123456"),
+	)
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+}

@@ -59,7 +59,7 @@ func TestClient_ListTemplatesWithCategory(t *testing.T) {
 }
 
 func TestClient_GetTemplate(t *testing.T) {
-	result, err := client.GetTemplate(t.Context(), "hello_world", "en_US")
+	result, err := client.GetTemplate(t.Context(), "auth", "pt_BR")
 	require.NoError(t, err)
 	require.NotEmpty(t, result)
 }
