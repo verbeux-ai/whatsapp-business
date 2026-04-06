@@ -27,7 +27,7 @@ func (s *Client) GetBusiness(ctx context.Context, businessAccountId string) (*Bu
 		return nil, err
 	}
 	if toReturn.ErrorResponse != nil {
-		return nil, fmt.Errorf("%s: %v", toReturn.ErrorResponse.Error.Message, toReturn)
+		return nil, fmt.Errorf("%s: %+v", toReturn.ErrorResponse.Error.Message, toReturn.ErrorResponse.Error)
 	}
 
 	return &toReturn, nil
@@ -47,7 +47,7 @@ func (s *Client) SetBusinessWebhook(ctx context.Context, businessAccountId strin
 		return nil, err
 	}
 	if toReturn.ErrorResponse != nil {
-		return nil, fmt.Errorf("%s: %v", toReturn.ErrorResponse.Error.Message, toReturn)
+		return nil, fmt.Errorf("%s: %+v", toReturn.ErrorResponse.Error.Message, toReturn.ErrorResponse.Error)
 	}
 
 	return &toReturn, nil
@@ -81,7 +81,7 @@ func (s *Client) GetBusinessProfile(ctx context.Context, phoneID string) (*Busin
 		return nil, err
 	}
 	if toReturn.ErrorResponse != nil {
-		return nil, fmt.Errorf("%s: %v", toReturn.ErrorResponse.Error.Message, toReturn)
+		return nil, fmt.Errorf("%s: %+v", toReturn.ErrorResponse.Error.Message, toReturn.ErrorResponse.Error)
 	}
 
 	if len(toReturn.Data) > 0 {

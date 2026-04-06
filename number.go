@@ -41,7 +41,7 @@ func (s *Client) GetPhoneNumber(ctx context.Context, phoneID string) (*PhoneNumb
 		return nil, err
 	}
 	if toReturn.ErrorResponse != nil {
-		return nil, fmt.Errorf("%s: %v", toReturn.ErrorResponse.Error.Message, toReturn)
+		return nil, fmt.Errorf("%s: %+v", toReturn.ErrorResponse.Error.Message, toReturn.ErrorResponse.Error)
 	}
 
 	return &toReturn, nil
@@ -72,7 +72,7 @@ func (s *Client) RegisterPhoneNumber(ctx context.Context, phoneID string, pin st
 		return nil, err
 	}
 	if toReturn.ErrorResponse != nil {
-		return nil, fmt.Errorf("%s: %v", toReturn.ErrorResponse.Error.Message, toReturn)
+		return nil, fmt.Errorf("%s: %+v", toReturn.ErrorResponse.Error.Message, toReturn.ErrorResponse.Error)
 	}
 
 	return &toReturn, nil
@@ -115,7 +115,7 @@ func (s *Client) SetPhoneNumberWebhook(ctx context.Context, phoneID string, requ
 		return nil, err
 	}
 	if toReturn.ErrorResponse != nil {
-		return nil, fmt.Errorf("%s: %v", toReturn.ErrorResponse.Error.Message, toReturn)
+		return nil, fmt.Errorf("%s: %+v", toReturn.ErrorResponse.Error.Message, toReturn.ErrorResponse.Error)
 	}
 
 	return &toReturn, nil

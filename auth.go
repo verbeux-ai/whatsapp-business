@@ -25,7 +25,7 @@ func (s *Client) GenerateAccessToken(ctx context.Context, code, clientID, client
 		return nil, err
 	}
 	if toReturn.ErrorResponse != nil {
-		return nil, fmt.Errorf("%s: %v", toReturn.ErrorResponse.Error.Message, toReturn)
+		return nil, fmt.Errorf("%s: %+v", toReturn.ErrorResponse.Error.Message, toReturn.ErrorResponse.Error)
 	}
 
 	return &toReturn, nil
