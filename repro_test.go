@@ -2,7 +2,6 @@ package whatsapp_business
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -54,8 +53,6 @@ func TestReproduction_Marshal(t *testing.T) {
 	err := json.Unmarshal([]byte(jsonPayload), &req)
 	assert.NoError(t, err)
 
-	marshalled, err := json.Marshal(req)
+	_, err = json.Marshal(req)
 	assert.NoError(t, err)
-
-	fmt.Printf("Marshalled: %s\n", string(marshalled))
 }
