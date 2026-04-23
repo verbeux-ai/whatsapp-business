@@ -90,18 +90,30 @@ func (s *Client) UploadFromURL(ctx context.Context, body UploadFromURL) (*Upload
 		return nil, fmt.Errorf("GET src bad status: %s", respIn.Status)
 	}
 
-	mimeType := respIn.Header.Get("Content-Type")
-	if strings.Contains(mimeType, "ogg") {
-		mimeType = "audio/ogg; codecs=opus"
-	}
-
 	parsedURL, err := url.Parse(body.URL)
 	filename := "media_file"
+	urlExt := ""
 	if err == nil {
 		filename = path.Base(parsedURL.Path)
+		urlExt = strings.ToLower(path.Ext(parsedURL.Path))
 	}
 	if filename == "." || filename == "/" {
 		filename = "upload.ogg"
+	}
+
+	// Meta's /media endpoint requires an accurate Content-Type to process the
+	// upload correctly. The origin server's Content-Type is often unreliable
+	// (e.g. Google Cloud Storage returns application/octet-stream when the
+	// object's content-type metadata was not set), so we fall back to the URL
+	// extension. Without this, Meta stores a blob Meta can't play back and the
+	// WhatsApp client surfaces "This audio is no longer available".
+	mimeType := respIn.Header.Get("Content-Type")
+	if strings.Contains(mimeType, "ogg") || urlExt == ".ogg" || urlExt == ".opus" {
+		mimeType = "audio/ogg; codecs=opus"
+	} else if mimeType == "" || mimeType == "application/octet-stream" {
+		if inferred := mime.TypeByExtension(urlExt); inferred != "" {
+			mimeType = inferred
+		}
 	}
 
 	pr, pw := io.Pipe()
