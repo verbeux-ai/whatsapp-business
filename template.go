@@ -219,8 +219,13 @@ func (s *Client) CreateTemplate(ctx context.Context, req CreateTemplateRequest) 
 }
 
 type UpdateTemplateRequest struct {
-	Category   CategoryType            `json:"category,omitempty"`
+	Category CategoryType `json:"category,omitempty"`
 	Components []TemplateDataComponent `json:"components,omitempty"`
+	// ParameterFormat declares whether the template uses named ({{name}}) or
+	// positional ({{1}}) variables. Meta rejects an update carrying named
+	// variable examples without this field ("Invalid parameter"), and the
+	// field did not exist here before — the format was silently dropped.
+	ParameterFormat ParameterFormatType `json:"parameter_format,omitempty"`
 }
 
 func (s *Client) UpdateTemplate(ctx context.Context, templateID string, req UpdateTemplateRequest) (*TemplateOperationResponse, error) {
