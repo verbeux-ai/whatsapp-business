@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 type messageRecipientType string
@@ -406,7 +407,7 @@ type SyncResponse struct {
 func (s *Client) RequestSync(ctx context.Context, syncType SyncType) (*SyncResponse, error) {
 	body := syncRequest{
 		MessagingProduct: whatsappMessagingProduct,
-		SyncType:         syncType,
+		SyncType:         SyncType(strings.ToLower(string(syncType))),
 	}
 
 	resp, err := s.metaRequestWithToken(ctx, body, http.MethodPost, fmt.Sprintf("%s/%s", s.phoneNumberID, messageHistoryEndpoint))
